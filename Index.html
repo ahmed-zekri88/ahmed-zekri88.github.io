@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Location</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        #status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>Share Your Location</h1>
+    <p>We need your current GPS coordinates for our records.</p>
+    
+    <button id="getLocation">Share My Location</button>
+    
+    <div id="status">Click the button above to share your location.</div>
+    
+    <script>
+        document.getElementById('getLocation').addEventListener('click', function() {
+            const statusElement = document.getElementById('status');
+            
+            if (!navigator.geolocation) {
+                statusElement.textContent = "Geolocation is not supported by your browser.";
+                statusElement.className = "error";
+                return;
+            }
+            
+            statusElement.textContent = "Getting your location...";
+            statusElement.className = "";
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Success callback
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    statusElement.textContent = lat,lng;
+                    statusElement.textContent = `Location found! Redirecting to form...`;
+                    statusElement.className = "success";
+                    
+                    // Store coordinates temporarily (in this case just for immediate use)
+                    localStorage.setItem('gps_coordinates', `${lat},${lng}`);
+                    
+                    // Replace with your actual Google Form URL and field ID
+                    const formUrl = 'https://docs.google.com/forms/d/1Tz0wIqj2aZ4lItqagvJcxmfb1Cizf5O_KgyTEaD6kho/viewform';
+                    const entryId = '2004466499'; // Replace with your field's entry ID
+                    
+                    // Redirect to pre-filled Google Form
+                    // Encode the coordinates for URL safety
+                    const encodedCoords = encodeURIComponent(`${lat},${lng}`);
+                    // Use &submit=Submit to auto-submit if desired (remove if not needed)
+                    window.location.href = `${formUrl}?entry.${entryId}=${encodedCoords}&submit=Submit`;
+                },
+                function(error) {
+                    // Error callback
+                    let errorMessage;
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = "You denied the request for geolocation.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = "Location information is unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = "The request to get location timed out.";
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            errorMessage = "An unknown error occurred.";
+                            break;
+                    }
+                    statusElement.textContent = errorMessage;
+                    statusElement.className = "error";
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+    </script>
+</body>
+</html>
