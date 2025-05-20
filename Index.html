@@ -75,10 +75,13 @@
                     
                     // Replace with your actual Google Form URL and field ID
                     const formUrl = 'https://forms.gle/zxDwTKjMjWdqaGUG6';
-                    const entryId = 2004466499; // Replace with your field's entry ID
+                    const entryId = '2004466499'; // Replace with your field's entry ID
                     
                     // Redirect to pre-filled Google Form
-                    window.location.href = `${formUrl}?entry.${entryId}=${lat},${lng}`;
+                    // Encode the coordinates for URL safety
+                    const encodedCoords = encodeURIComponent(`${lat},${lng}`);
+                    // Use &submit=Submit to auto-submit if desired (remove if not needed)
+                    window.location.href = `${formUrl}?entry.${entryId}=${encodedCoords}&submit=Submit`;
                 },
                 function(error) {
                     // Error callback
