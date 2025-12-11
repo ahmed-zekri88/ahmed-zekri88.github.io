@@ -12,7 +12,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
@@ -21,17 +21,17 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 8000px;
             background-color: white;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             display: block;
         }
-        
+
         /* Hide all pages by default */
         .page {
             display: none;
@@ -40,7 +40,8 @@
         /* Show the active page */
         .page.active {
             display: block;
-        }
+        }       
+        
         
         /* WELCOME PAGE STYLES */
         .header {
@@ -55,7 +56,6 @@
             margin-bottom: 10px;
             font-weight: 700;
         }
-        
         .header p {
             font-size: 1.2rem;
             opacity: 0.9;
@@ -147,6 +147,29 @@
         }
         
         /* ATTENDANCE PAGE STYLES */
+        .back-button {
+            top: 20px;
+            left: 20px;  
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.0s ease;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
         .attendance-header {
             background: linear-gradient(to right, #00b09b, #96c93d);
             color: white;
@@ -167,28 +190,6 @@
             margin: 0 auto;
         }
         
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .back-button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
         
         .activity-options {
             display: flex;
@@ -582,6 +583,370 @@
                 width: 100%;
             }
         }
+      
+      
+           
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo i {
+            font-size: 40px;
+            background: linear-gradient(45deg, #00e5ff, #00e676);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+
+        
+        
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ff1744;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.active {
+            background-color: #00e676;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        
+        .user-info-card {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid #00e5ff;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #6c757d;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            color: #1a237e;
+            font-weight: 700;
+            text-align: right;
+            word-break: break-all;
+        }
+        
+        .device-id {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .location-requirement-card {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 3px solid #ffb300;
+            text-align: center;
+        }
+        
+        .location-requirement-card.hidden {
+            display: none;
+        }
+        
+        .location-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #ffb300;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 32px;
+        }
+        
+        .location-requirement-card h3 {
+            color: #ff6f00;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .location-requirement-card p {
+            color: #5f6368;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .location-permission-btn {
+            background: linear-gradient(to right, #ff6f00, #ffb300);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 0 auto;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .location-permission-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 111, 0, 0.3);
+        }
+        
+        .location-permission-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .attendance-button-section {
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+        
+        .attendance-button-section.hidden {
+            display: none;
+        }
+        
+        .attendance-button {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #00e5ff, #00e676);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 15px 30px rgba(0, 229, 255, 0.4);
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        .attendance-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 229, 255, 0.6);
+        }
+        
+        .attendance-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.3);
+        }
+        
+        .attendance-button.pressed {
+            background: linear-gradient(145deg, #00c853, #00e676);
+            box-shadow: 0 10px 20px rgba(0, 200, 83, 0.3);
+            transform: scale(0.98);
+        }
+        
+        .attendance-button.sending {
+            background: linear-gradient(145deg, #ff9100, #ffab00);
+            cursor: not-allowed;
+        }
+        
+        .attendance-button.disabled {
+            background: linear-gradient(145deg, #b0bec5, #78909c);
+            cursor: not-allowed;
+            box-shadow: 0 10px 20px rgba(176, 190, 197, 0.3);
+        }
+        
+        .attendance-button.disabled:hover {
+            transform: none;
+            box-shadow: 0 10px 20px rgba(176, 190, 197, 0.3);
+        }
+        
+        .attendance-button i {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .attendance-button span {
+            font-size: 1.1rem;
+        }
+        
+        .attendance-time {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-top: 10px;
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #5f6368;
+        }
+        
+        .sync-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-top-color: #00e5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        
+        @media (max-width: 500px) {
+            .content {
+                padding: 25px 20px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .attendance-button {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .attendance-time {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #00c853;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.error {
+            background-color: #ff1744;
+        }
+        
+        .notification.warning {
+            background-color: #ff9100;
+        }
+        
+        .notification i {
+            font-size: 1.5rem;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        
+        .notification-message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .auto-refresh {
+            color: #00e5ff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .location-warning {
+            color: #ff1744;
+            font-weight: 600;
+        }
+        
+        .location-success {
+            color: #00c853;
+            font-weight: 600;
+        }
     </style>
   </head>
   <body> <!-- WELCOME PAGE -->
@@ -626,13 +991,15 @@
           </div>
         </div>
         <div class="footer">
-          <p>System Catalogue Selector © 2023 | Select an option to continue</p>
+          <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
         </div>
       </div>
+      <!---------------------------------------------------------------------------------->
       <!-- ATTENDANCE PAGE -->
       <div id="attendancePage" class="page">
-        <div class="attendance-header"> <button class="back-button" onclick="goBackToWelcome()">
-            <i class="fas fa-arrow-left"></i> </button>
+        <div class="attendance-header"> <button class="back-button" onclick="goBackToWelcome()"><i
+
+              class="fas fa-arrow-left"></i> </button>
           <h1>Attendance Module</h1>
           <p>Manage attendance records, clock in/out, and vacation requests</p>
         </div>
@@ -682,66 +1049,71 @@
           </div>
         </div>
         <div class="footer">
-          <p>Attendance Module © 2023 | Select an activity to continue</p>
+          <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
         </div>
       </div>
+      <!----------------------------------------------------------------------------------------------->
       <!-- PUSH-TO-START DATA COLLECTION PAGE -->
       <div id="pushToStartPage" class="page">
-        <div class="data-collection-header"> <button class="back-button" onclick="goBackToAttendance()">
-            <i class="fas fa-arrow-left"></i> </button>
-          <h1>Push-to-Start: Clock In</h1>
-          <p>Automatically collecting your information for attendance tracking</p>
+        <div class="notification" id="notification"> <i class="fas fa-check-circle" id="notificationIcon"></i>
+          <div class="notification-content">
+            <div class="notification-title" id="notificationTitle">Success!</div>
+            <div class="notification-message" id="notificationMessage">Attendance
+              marked successfully</div>
+          </div>
         </div>
-        <div class="data-collection-content">
-          <div class="clock-status">
-            <div class="clock-icon"> <i class="fas fa-clock"></i> </div>
-            <h2>Clock In Session Started</h2>
-            <p>Your attendance session is being recorded with the following
-              information:</p>
+        <div class="container">
+          <div class="header">       
+            <button class="back-button" onclick="goBackToAttendance()"><i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Mobile Attendance System</h1>
+            <p>Press the button below to mark your attendance</p>
+            <div class="status-indicator">
+              <div class="status-dot" id="statusDot"></div>
+              <span id="statusText">Location Access Required</span> </div>
           </div>
-          <!-- Success Message (shown after auto-clock-in) -->
-          <div id="successMessage" class="success-message">
-            <div class="success-icon"> <i class="fas fa-check"></i> </div>
-            <h3>Clock In Successful!</h3>
-            <p>Your attendance has been automatically recorded.</p>
-            <p id="successDetails">Loading details...</p>
-            <p id="googleSheetsStatus" style="font-size: 0.9rem; margin-top: 10px;"></p>
-          </div>
-          <div class="data-collection-section">
-            <h3>Collected Information</h3>
-            <div class="data-grid">
-              <div class="data-item">
-                <h4><i class="fas fa-envelope"></i> Browser Account Email</h4>
-                <div id="userEmail" class="data-value data-loading">Detecting
-                  browser account...</div>
+          <div class="content">
+            <div class="user-info-card">
+              <div class="info-row">
+                <div class="info-label">Device ID:</div>
+                <div class="info-value device-id" id="deviceId">Loading...</div>
               </div>
-              <div class="data-item">
-                <h4><i class="fas fa-calendar-day"></i> Current Date</h4>
-                <div id="currentDate" class="data-value data-loading">Getting
-                  date...</div>
+              <div class="info-row">
+                <div class="info-label">Current Time:</div>
+                <div class="info-value" id="currentTime">--:--:--</div>
               </div>
-              <div class="data-item">
-                <h4><i class="fas fa-clock"></i> Clock In Time</h4>
-                <div id="clockInTime" class="data-value data-loading">Capturing
-                  time...</div>
+              <div class="info-row">
+                <div class="info-label">Current Date:</div>
+                <div class="info-value" id="currentDate">--/--/----</div>
               </div>
-              <div class="data-item">
-                <h4><i class="fas fa-map-marker-alt"></i> Geolocation</h4>
-                <div id="geolocation" class="data-value data-loading">Requesting
-                  location access...</div>
+              <div class="info-row">
+                <div class="info-label">Location Status:</div>
+                <div class="info-value location-warning" id="locationStatus">NOT
+                  ENABLED</div>
               </div>
             </div>
+            <div class="location-requirement-card" id="locationRequirementCard">
+              <div class="location-icon"> <i class="fas fa-location-dot"></i> </div>
+              <h3>Location Access Required</h3>
+              <p>Please enable location access to mark your attendance.</p>
+              <button class="location-permission-btn" id="enableLocationBtn"> <i
+
+                  class="fas fa-map-marker-alt"></i> Enable Location Access </button>
+            </div>
+            <div class="attendance-button-section hidden" id="attendanceButtonSection">
+              <button class="attendance-button" id="attendanceButton"> <i class="fas fa-hand-point-up"></i>
+                <span>PUSH-TO-START</span> </button>
+              <div class="attendance-time" id="attendanceTime">--:--:--</div>
+              <div class="auto-refresh"> <i class="fas fa-sync-alt"></i> <span>Time
+                  updates automatically</span> </div>
+              <div class="sync-status">
+                <div class="sync-spinner" id="syncSpinner"></div>
+                <span id="syncStatus">Ready to mark attendance</span> </div>
+            </div>
+            <div class="footer">
+              <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
+            </div>
           </div>
-          <div class="action-buttons"> <button class="btn btn-secondary" onclick="goBackToAttendance()">
-              <i class="fas fa-arrow-left"></i> Back to Activities </button> </div>
-          <div id="dataCollectionMessage" class="selection-message">
-            <h3>Status:</h3>
-            <p id="collectionStatus">Collecting data...</p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Push-to-Start Module © 2023 | Your privacy is protected. Data is
-            encrypted and secured.</p>
         </div>
       </div>
     </div>
@@ -756,19 +1128,6 @@
             browserInfo: null,
             clockInCompleted: false,
             googleSheetsSaved: false
-        };
-        
-        // Google Sheets Configuration
-        const GOOGLE_SHEETS_CONFIG = {
-            // Your Google Sheet ID (from the URL: https://docs.google.com/spreadsheets/d/[THIS_IS_THE_ID]/edit...)
-            sheetId: '1kU1mcr237FoOMVvONYlHlpTXZzOKRQdtnesik_hvw2A',
-            
-            // Sheet name (tab name)
-            sheetName: 'sheet1', // Change this if your sheet has a different name
-            
-            // Google Apps Script Web App URL
-            // You need to create a Google Apps Script and deploy it as a Web App
-            scriptUrl: 'https://script.google.com/macros/s/AKfycbyoG12wC41hUWoTOQRmzCid4_yojNCxC3UR_bd7G8xovETipegbnnJnzrFyqA71SS7d-Q/exec'
         };
         
         // Page navigation functions
@@ -794,13 +1153,6 @@
             
             document.getElementById('attendancePage').classList.remove('active');
             document.getElementById('pushToStartPage').classList.add('active');
-            
-            // Reset clock-in status
-            userData.clockInCompleted = false;
-            userData.googleSheetsSaved = false;
-            
-            // Start collecting data automatically
-            startDataCollection();
         }
         
         function selectCatalogue(catalogue) {
@@ -867,615 +1219,465 @@
                 }, 500);
             }
         }
-        
-        // Browser Account Detection
-        function detectBrowserAccount() {
-            // Store browser information
-            userData.browserInfo = {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                vendor: navigator.vendor,
-                language: navigator.language,
-                languages: navigator.languages,
-                cookieEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack,
-                hardwareConcurrency: navigator.hardwareConcurrency,
-                maxTouchPoints: navigator.maxTouchPoints,
-                pdfViewerEnabled: navigator.pdfViewerEnabled
-            };
+
+    //----------------------------------------------------------------------------------------------------
+      document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const attendanceButton = document.getElementById('attendanceButton');
+            const attendanceButtonSection = document.getElementById('attendanceButtonSection');
+            const locationRequirementCard = document.getElementById('locationRequirementCard');
+            const enableLocationBtn = document.getElementById('enableLocationBtn');
+            const currentTimeElement = document.getElementById('currentTime');
+            const currentDateElement = document.getElementById('currentDate');
+            const deviceIdElement = document.getElementById('deviceId');
+            const locationStatus = document.getElementById('locationStatus');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const attendanceTimeElement = document.getElementById('attendanceTime');
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const notificationIcon = document.getElementById('notificationIcon');
+            const syncSpinner = document.getElementById('syncSpinner');
+            const syncStatus = document.getElementById('syncStatus');
             
-            // Try multiple methods to get browser account email
-            let detectedEmail = null;
+            // Google Apps Script URL for YOUR Google Sheet
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl5qZckwnJ40eQRrpZMw6Cjd2C1YyOvhRZHd0AMfif4vw0q3lZ8hoMC3e6tLj2RzNR/exec';
             
-            // Method 1: Try to get from browser's credential management API
-            if (navigator.credentials && navigator.credentials.get) {
-                try {
-                    // This would work if the site has saved credentials
-                    const cred = navigator.credentials.get({
-                        password: true,
-                        mediation: 'silent'
-                    });
-                    
-                    if (cred && cred.id && cred.id.includes('@')) {
-                        detectedEmail = cred.id;
-                    }
-                } catch (e) {
-                    // Credential API not available or blocked
-                    console.log("Credential API not accessible:", e);
-                }
-            }
+            // Global variables
+            let deviceId = null;
+            let userLocation = null;
+            let watchId = null;
+            let isButtonPressed = false;
             
-            // Method 2: Check for Google Chrome sync status (for Chrome browsers)
-            if (!detectedEmail && /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
-                // In Chrome, we can try to detect if user is signed in
-                detectedEmail = detectChromeAccount();
-            }
-            
-            // Method 3: Check for Firefox account
-            if (!detectedEmail && /Firefox/.test(navigator.userAgent)) {
-                detectedEmail = detectFirefoxAccount();
-            }
-            
-            // Method 4: Check for Safari/Apple account
-            if (!detectedEmail && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) {
-                detectedEmail = detectSafariAccount();
-            }
-            
-            // Method 5: Check for Microsoft Edge account
-            if (!detectedEmail && /Edg/.test(navigator.userAgent)) {
-                detectedEmail = detectEdgeAccount();
-            }
-            
-            // Method 6: Check localStorage for previously saved email
-            if (!detectedEmail) {
-                detectedEmail = localStorage.getItem('browserAccountEmail');
-            }
-            
-            // Method 7: Check for any stored authentication data
-            if (!detectedEmail) {
-                detectedEmail = scanStorageForEmail();
-            }
-            
-            return detectedEmail;
-        }
-        
-        function detectChromeAccount() {
-            // Chrome stores sync information in localStorage when signed in
-            // Look for Chrome-specific keys
-            const chromeKeys = [
-                'chrome_sync',
-                'google_account',
-                'gaia_auth',
-                'chrome_signed_in',
-                'sync_account'
-            ];
-            
-            for (const key of chromeKeys) {
-                const value = localStorage.getItem(key);
-                if (value) {
-                    try {
-                        const parsed = JSON.parse(value);
-                        if (parsed && parsed.email) {
-                            return parsed.email;
-                        }
-                    } catch (e) {
-                        // Not JSON, check if it looks like an email
-                        if (value.includes('@') && value.includes('.')) {
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (emailRegex.test(value)) {
-                                return value;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Check for Google OAuth tokens
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.includes('google') || key.includes('oauth') || key.includes('auth')) {
-                    const value = localStorage.getItem(key);
-                    if (value && value.includes('@')) {
-                        try {
-                            // Try to parse as JWT
-                            const parts = value.split('.');
-                            if (parts.length === 3) {
-                                const payload = JSON.parse(atob(parts[1]));
-                                if (payload && payload.email) {
-                                    return payload.email;
-                                }
-                            }
-                        } catch (e) {
-                            // Not JWT, continue
-                        }
-                    }
-                }
-            }
-            
-            return null;
-        }
-        
-        function detectFirefoxAccount() {
-            // Firefox account detection
-            // Firefox sync accounts might be stored in indexedDB or localStorage
-            const firefoxKeys = [
-                'firefox_account',
-                'fxaccount',
-                'mozilla_account',
-                'sync_account'
-            ];
-            
-            for (const key of firefoxKeys) {
-                const value = localStorage.getItem(key);
-                if (value) {
-                    try {
-                        const parsed = JSON.parse(value);
-                        if (parsed && parsed.email) {
-                            return parsed.email;
-                        }
-                    } catch (e) {
-                        // Not JSON, check if it looks like an email
-                        if (value.includes('@') && value.includes('.')) {
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (emailRegex.test(value)) {
-                                return value;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return null;
-        }
-        
-        function detectSafariAccount() {
-            // Safari/iCloud account detection
-            // Safari uses iCloud Keychain for account storage
-            // In a web context, we can only check for iCloud cookies or localStorage
-            const safariKeys = [
-                'apple_account',
-                'icloud_account',
-                'safari_account'
-            ];
-            
-            for (const key of safariKeys) {
-                const value = localStorage.getItem(key);
-                if (value) {
-                    try {
-                        const parsed = JSON.parse(value);
-                        if (parsed && parsed.email) {
-                            return parsed.email;
-                        }
-                    } catch (e) {
-                        // Not JSON, check if it looks like an email
-                        if (value.includes('@') && value.includes('.')) {
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (emailRegex.test(value)) {
-                                return value;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return null;
-        }
-        
-        function detectEdgeAccount() {
-            // Microsoft Edge account detection
-            // Edge uses Microsoft accounts for sync
-            const edgeKeys = [
-                'edge_account',
-                'microsoft_account',
-                'live_account',
-                'outlook_account'
-            ];
-            
-            for (const key of edgeKeys) {
-                const value = localStorage.getItem(key);
-                if (value) {
-                    try {
-                        const parsed = JSON.parse(value);
-                        if (parsed && parsed.email) {
-                            return parsed.email;
-                        }
-                    } catch (e) {
-                        // Not JSON, check if it looks like an email
-                        if (value.includes('@') && value.includes('.')) {
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (emailRegex.test(value)) {
-                                return value;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return null;
-        }
-        
-        function scanStorageForEmail() {
-            // Scan all localStorage for email patterns
-            const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-            
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                const value = localStorage.getItem(key);
+            // Initialize device ID
+            function initializeDeviceId() {
+                // Try to get existing device ID from localStorage
+                deviceId = localStorage.getItem('attendance_device_id');
                 
-                if (value && typeof value === 'string' && value.length < 500) {
-                    const matches = value.match(emailPattern);
-                    if (matches && matches.length > 0) {
-                        // Return the first valid email
-                        for (const email of matches) {
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (emailRegex.test(email)) {
-                                return email;
-                            }
-                        }
-                    }
+                // If no device ID exists, generate a new one
+                if (!deviceId) {
+                    // Generate a unique device identifier
+                    const randomPart = Math.random().toString(36).substring(2, 10);
+                    const timePart = Date.now().toString(36);
+                    deviceId = `DEV-${randomPart}${timePart}`.toUpperCase();
+                    
+                    // Store in localStorage for future use
+                    localStorage.setItem('attendance_device_id', deviceId);
+                }
+                
+                // Display device ID
+                deviceIdElement.textContent = deviceId;
+                
+                // Check initial location status
+                checkInitialLocationStatus();
+            }
+            
+            // Check initial location status
+            function checkInitialLocationStatus() {
+                if (navigator.geolocation) {
+                    // Try to get current position to check if permission is already granted
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            // Location permission already granted
+                            handleLocationSuccess(position);
+                        },
+                        (error) => {
+                            // Location permission not granted or error
+                            console.log('Initial location check:', error.message);
+                            // Show location requirement card
+                            locationRequirementCard.classList.remove('hidden');
+                            attendanceButtonSection.classList.add('hidden');
+                        },
+                        { timeout: 2000, maximumAge: 0 }
+                    );
+                } else {
+                    // Geolocation not supported
+                    locationStatus.textContent = 'NOT SUPPORTED';
+                    locationStatus.style.color = '#ff1744';
+                    showNotification('Error', 'Geolocation is not supported by your browser', true);
                 }
             }
             
-            return null;
-        }
-        
-        function generateBrowserFingerprint() {
-            // Generate a unique fingerprint based on browser characteristics
-            const components = [
-                navigator.userAgent,
-                navigator.platform,
-                navigator.language,
-                navigator.hardwareConcurrency,
-                navigator.maxTouchPoints,
-                screen.width + 'x' + screen.height,
-                screen.colorDepth + 'bit'
-            ];
-            
-            // Create a simple hash
-            let hash = 0;
-            const str = components.join('|');
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32bit integer
+            // Update current time display
+            function updateCurrentTime() {
+                const now = new Date();
+                
+                // Format time as HH:MM:SS
+                const timeString = now.toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                // Format date as DD/MM/YYYY
+                const dateString = now.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                currentTimeElement.textContent = timeString;
+                currentDateElement.textContent = dateString;
+                
+                // Update attendance button time if it was pressed recently
+                if (isButtonPressed) {
+                    const pressedTime = new Date(isButtonPressed);
+                }
             }
             
-            return 'browser-' + Math.abs(hash).toString(16).substring(0, 8);
-        }
-        
-        // Save data to Google Sheets
-        async function saveToGoogleSheets() {
-            if (userData.googleSheetsSaved) {
-                return true; // Already saved
-            }
-            
-            updateStatus("Saving data to Google Sheets...");
-            
-            try {
-                // Prepare the data for Google Sheets
-                const sheetData = {
-                    email: userData.email || 'Not detected',
-                    date: userData.date || 'Not available',
-                    time: userData.time || 'Not available',
-                    location: userData.geolocation ? 
-                        `Lat: ${userData.geolocation.lat.toFixed(6)}, Lng: ${userData.geolocation.lng.toFixed(6)}` : 
-                        'Not available',
-                    accuracy: userData.geolocation ? `${Math.round(userData.geolocation.accuracy)}m` : 'N/A',
-                    timestamp: new Date().toISOString(),
-                    browser: navigator.userAgent.substring(0, 100),
-                    ip: 'Not captured (requires server-side)'
+            // Handle successful location acquisition
+            function handleLocationSuccess(position) {
+                userLocation = {
+                    lat: position.coords.latitude.toFixed(6),
+                    lng: position.coords.longitude.toFixed(6),
+                    accuracy: Math.round(position.coords.accuracy),
+                    timestamp: new Date(position.timestamp).toLocaleTimeString()
                 };
                 
-                // Method 1: Try using Google Apps Script Web App
-                const response = await fetch(GOOGLE_SHEETS_CONFIG.scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors', // Note: no-cors mode doesn't allow reading response
-                    headers: {
-                        'Content-Type': 'application/json',
+                // Update UI
+                locationStatus.textContent = `ENABLED ✓`;
+                locationStatus.style.color = '#00c853';
+                statusDot.className = 'status-dot active';
+                statusText.textContent = 'Ready to Mark Attendance';
+                
+                // Show attendance button section, hide location requirement
+                locationRequirementCard.classList.add('hidden');
+                attendanceButtonSection.classList.remove('hidden');
+                
+                // Update sync status
+                syncStatus.textContent = 'Ready to mark attendance';
+                
+                // Save location enabled state
+                localStorage.setItem('attendance_location_enabled', 'true');
+                
+                // Start watching location for updates
+                startWatchingLocation();
+                
+                console.log('Location enabled:', userLocation);
+            }
+            
+            // Request location access
+            function requestLocationAccess() {
+                if (!navigator.geolocation) {
+                    showNotification('Error', 'Geolocation is not supported by your browser', true);
+                    locationStatus.textContent = 'NOT SUPPORTED';
+                    locationStatus.style.color = '#ff1744';
+                    return;
+                }
+                
+                // Show loading state
+                enableLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting Location...';
+                enableLocationBtn.disabled = true;
+                
+                // Request high accuracy location
+                navigator.geolocation.getCurrentPosition(
+                    // Success callback
+                    (position) => {
+                        handleLocationSuccess(position);
+                        
+                        // Reset button
+                        enableLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Enable Location Access';
+                        enableLocationBtn.disabled = false;
+                        
+                        // Show success notification
+                        showNotification('Location Enabled', 'You can now mark attendance');
                     },
-                    body: JSON.stringify(sheetData)
-                });
-                
-                // Since we're using no-cors, we can't read the response
-                // But we assume it worked if no error was thrown
-                userData.googleSheetsSaved = true;
-                
-                // Update UI to show success
-                document.getElementById('googleSheetsStatus').innerHTML = 
-                    '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> Data saved to Google Sheets</span>';
-                
-                updateStatus("Data successfully saved to Google Sheets!");
-                return true;
-                
-            } catch (error) {
-                console.error("Error saving to Google Sheets:", error);
-                
-                // Fallback: Save to localStorage and show instructions
-                const failedRecords = JSON.parse(localStorage.getItem('failedGoogleSheetsRecords') || '[]');
-                failedRecords.push({
-                    ...sheetData,
-                    error: error.message,
-                    timestamp: new Date().toISOString()
-                });
-                localStorage.setItem('failedGoogleSheetsRecords', JSON.stringify(failedRecords));
-                
-                document.getElementById('googleSheetsStatus').innerHTML = 
-                    '<span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Failed to save to Google Sheets. Data stored locally.</span>';
-                
-                updateStatus("Could not save to Google Sheets. Data stored locally.");
-                return false;
-            }
-        }
-        
-        // Automatic clock-in function
-        async function autoClockIn() {
-            if (userData.clockInCompleted) {
-                return; // Already clocked in
-            }
-            
-            // Validate that we have all required data
-            if (!userData.email || !userData.date || !userData.time) {
-                updateStatus("Waiting for data collection to complete...");
-                return;
-            }
-            
-            // Mark as completed
-            userData.clockInCompleted = true;
-            
-            // Save to localStorage (simulating server storage)
-            const clockInRecords = JSON.parse(localStorage.getItem('clockInRecords') || '[]');
-            clockInRecords.push({
-                ...userData,
-                timestamp: new Date().toISOString(),
-                status: 'auto_clocked_in',
-                pushTimestamp: userData.pushTime ? userData.pushTime.toISOString() : new Date().toISOString(),
-                browserInfo: userData.browserInfo
-            });
-            localStorage.setItem('clockInRecords', JSON.stringify(clockInRecords));
-            
-            // Try to save to Google Sheets
-            const sheetsSuccess = await saveToGoogleSheets();
-            
-            // Show success message
-            const successMessage = document.getElementById('successMessage');
-            const successDetails = document.getElementById('successDetails');
-            
-            let detailsText = `You have been automatically clocked in at ${userData.time} on ${userData.date}.\n\n`;
-            detailsText += `Browser Account: ${userData.email}\n\n`;
-            
-            if (userData.geolocation) {
-                detailsText += `Location recorded: ${userData.geolocation.lat.toFixed(6)}, ${userData.geolocation.lng.toFixed(6)}\n\n`;
-            } else {
-                detailsText += `Note: Location was not recorded.\n\n`;
-            }
-            
-            detailsText += `This information has been securely recorded.`;
-            
-            successDetails.textContent = detailsText;
-            successMessage.classList.add('active');
-            
-            // Update status
-            updateStatus("Clock-in completed successfully!");
-            
-            // Auto-return to attendance page after 5 seconds
-            setTimeout(() => {
-                goBackToAttendance();
-            }, 5000);
-        }
-        
-        // Data collection functions
-        function startDataCollection() {
-            // Show loading states
-            updateStatus("Starting data collection...");
-            
-            // Get current date and time
-            updateDateTime();
-            
-            // Display the captured push time immediately
-            displayCapturedTime();
-            
-            // Try to detect browser account email
-            detectAndSetEmail();
-            
-            // Get geolocation
-            getGeolocation();
-        }
-        
-        function detectAndSetEmail() {
-            // Show loading state
-            document.getElementById('userEmail').textContent = "Detecting browser account...";
-            document.getElementById('userEmail').className = "data-value data-loading";
-            
-            updateStatus("Attempting to detect browser account email...");
-            
-            // Try to detect email
-            setTimeout(() => {
-                const detectedEmail = detectBrowserAccount();
-                
-                if (detectedEmail) {
-                    userData.email = detectedEmail;
-                    
-                    document.getElementById('userEmail').textContent = detectedEmail;
-                    document.getElementById('userEmail').className = "data-value data-success";
-                    
-                    // Store for future use
-                    localStorage.setItem('browserAccountEmail', detectedEmail);
-                    
-                    updateStatus("Browser account email detected successfully.");
-                    
-                    // Check if we can auto-clock-in now
-                    checkAndAutoClockIn();
-                } else {
-                    // If no email detected, show error and use browser fingerprint
-                    const browserFingerprint = generateBrowserFingerprint();
-                    userData.email = browserFingerprint + "@browser.attendance";
-                    
-                    document.getElementById('userEmail').textContent = userData.email + " (browser fingerprint)";
-                    document.getElementById('userEmail').className = "data-value data-warning";
-                    
-                    updateStatus("Could not detect browser account email. Using browser fingerprint.");
-                    
-                    // Check if we can auto-clock-in now
-                    checkAndAutoClockIn();
-                }
-            }, 1500);
-        }
-        
-        function checkAndAutoClockIn() {
-            // Check if all required data is available for auto-clock-in
-            if (userData.email && userData.date && userData.time) {
-                // If location is still loading, wait a bit longer
-                if (!userData.geolocation) {
-                    setTimeout(() => {
-                        autoClockIn();
-                    }, 2000);
-                } else {
-                    autoClockIn();
-                }
-            }
-        }
-        
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Format date
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = now.toLocaleDateString('en-US', dateOptions);
-            userData.date = formattedDate;
-            document.getElementById('currentDate').textContent = formattedDate;
-            document.getElementById('currentDate').className = "data-value";
-            
-            // Check if we can auto-clock-in now
-            checkAndAutoClockIn();
-        }
-        
-        function displayCapturedTime() {
-            if (userData.pushTime) {
-                // Format the captured time (when push-to-start was clicked)
-                const formattedTime = userData.pushTime.toLocaleTimeString('en-US', { 
-                    hour12: true, 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                userData.time = formattedTime;
-                document.getElementById('clockInTime').textContent = formattedTime;
-                document.getElementById('clockInTime').className = "data-value";
-                
-                updateStatus("Clock-in time captured successfully.");
-                
-                // Check if we can auto-clock-in now
-                checkAndAutoClockIn();
-            } else {
-                // Fallback to current time if pushTime wasn't captured
-                const now = new Date();
-                const formattedTime = now.toLocaleTimeString('en-US', { 
-                    hour12: true, 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                userData.time = formattedTime;
-                document.getElementById('clockInTime').textContent = formattedTime + " (current)";
-                document.getElementById('clockInTime').className = "data-value";
-                
-                updateStatus("Using current time for clock-in.");
-                
-                // Check if we can auto-clock-in now
-                checkAndAutoClockIn();
-            }
-        }
-        
-        function getGeolocation() {
-            if (!navigator.geolocation) {
-                document.getElementById('geolocation').textContent = "Geolocation not supported by browser";
-                document.getElementById('geolocation').className = "data-value data-error";
-                updateStatus("Geolocation not supported.");
-                
-                // Check if we can auto-clock-in now (without location)
-                checkAndAutoClockIn();
-                return;
-            }
-            
-            // Request high accuracy location
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 10000, // 10 seconds
-                maximumAge: 0
-            };
-            
-            navigator.geolocation.getCurrentPosition(
-                // Success callback
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const accuracy = position.coords.accuracy;
-                    
-                    userData.geolocation = { lat, lng, accuracy };
-                    
-                    // Format for display - ONLY COORDINATES, NO ADDRESS SEARCH
-                    const locationText = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)} (Accuracy: ${Math.round(accuracy)}m)`;
-                    document.getElementById('geolocation').textContent = locationText;
-                    document.getElementById('geolocation').className = "data-value";
-                    
-                    updateStatus("Location coordinates acquired successfully.");
-                    
-                    // Check if we can auto-clock-in now
-                    checkAndAutoClockIn();
-                },
-                // Error callback
-                function(error) {
-                    let errorMessage = "Location access denied or failed. ";
-                    
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage += "Please enable location permissions.";
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage += "Location information unavailable.";
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage += "Location request timed out.";
-                            break;
-                        default:
-                            errorMessage += "Unknown error occurred.";
+                    // Error callback
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        
+                        let errorMessage = '';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'Location permission denied. You must enable location to mark attendance.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Location information is unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'Location request timed out.';
+                                break;
+                            default:
+                                errorMessage = 'An unknown error occurred.';
+                        }
+                        
+                        // Update UI
+                        locationStatus.textContent = 'DENIED ✗';
+                        locationStatus.style.color = '#ff1744';
+                        statusDot.style.backgroundColor = '#ff1744';
+                        statusText.textContent = 'Location Access Denied';
+                        
+                        // Reset button
+                        enableLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Enable Location Access';
+                        enableLocationBtn.disabled = false;
+                        
+                        // Show error notification
+                        showNotification('Location Required', errorMessage, true);
+                        
+                        // Force location requirement
+                        locationRequirementCard.classList.remove('hidden');
+                        attendanceButtonSection.classList.add('hidden');
+                    },
+                    // Options
+                    { 
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0
                     }
-                    
-                    document.getElementById('geolocation').textContent = errorMessage;
-                    document.getElementById('geolocation').className = "data-value data-error";
-                    updateStatus("Could not get location: " + errorMessage);
-                    
-                    // Check if we can auto-clock-in now (without location)
-                    checkAndAutoClockIn();
-                },
-                options
-            );
-        }
-        
-        function updateStatus(message) {
-            document.getElementById('collectionStatus').textContent = message;
-            const messageDiv = document.getElementById('dataCollectionMessage');
-            messageDiv.classList.add('active');
-            
-            // Auto-hide after 5 seconds if not important
-            if (!message.includes("Error") && !message.includes("Failed")) {
-                setTimeout(() => {
-                    messageDiv.classList.remove('active');
-                }, 5000);
+                );
             }
-        }
-        
-        // Initialize on page load
-        window.onload = function() {
-            console.log("System initialized. Welcome page loaded.");
             
-            // Show a note about Google Sheets integration
-            console.log("Google Sheets integration is configured.");
-            console.log("Sheet ID:", GOOGLE_SHEETS_CONFIG.sheetId);
-            console.log("Web App URL:", GOOGLE_SHEETS_CONFIG.scriptUrl);
-        };
+            // Start watching location for updates
+            function startWatchingLocation() {
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+                
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        // Update location
+                        userLocation = {
+                            lat: position.coords.latitude.toFixed(6),
+                            lng: position.coords.longitude.toFixed(6),
+                            accuracy: Math.round(position.coords.accuracy),
+                            timestamp: new Date(position.timestamp).toLocaleTimeString()
+                        };
+                        
+                        console.log('Location updated:', userLocation);
+                    },
+                    (error) => {
+                        console.error('Location watch error:', error);
+                        
+                        // If permission is denied, disable attendance
+                        if (error.code === error.PERMISSION_DENIED) {
+                            disableLocationAccess();
+                            showNotification('Location Lost', 'Location access was revoked. Attendance disabled.', true);
+                        }
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        maximumAge: 30000,
+                        timeout: 15000
+                    }
+                );
+            }
+            
+            // Disable location access (when permission is revoked)
+            function disableLocationAccess() {
+                userLocation = null;
+                
+                // Update UI
+                locationStatus.textContent = 'NOT ENABLED';
+                locationStatus.style.color = '#ff1744';
+                statusDot.className = 'status-dot';
+                statusText.textContent = 'Location Access Required';
+                
+                // Show location requirement
+                locationRequirementCard.classList.remove('hidden');
+                attendanceButtonSection.classList.add('hidden');
+                
+                // Clear location watch
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+                
+                // Clear saved state
+                localStorage.removeItem('attendance_location_enabled');
+            }
+            
+            // Check if location is valid
+            function isLocationValid() {
+                return userLocation && 
+                       userLocation.lat && 
+                       userLocation.lat !== 'N/A' && 
+                       userLocation.lng && 
+                       userLocation.lng !== 'N/A';
+            }
+            
+            // Generate a unique session ID
+            function generateSessionId() {
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substring(2, 8);
+                return `SESS-${timestamp}-${random}`.toUpperCase();
+            }
+            
+            // Send data to Google Sheets
+            async function sendToGoogleSheets(attendanceData) {
+                // Show sync status
+                syncSpinner.style.display = 'block';
+                syncStatus.textContent = 'Sending to Google Sheets...';
+                
+                try {
+                    // Prepare the data to send
+                    const payload = {
+                        action: 'addAttendance',
+                        deviceId: attendanceData.deviceId,
+                        date: attendanceData.date,
+                        time: attendanceData.time,
+                        dateTime: attendanceData.dateTime,
+                        sessionId: attendanceData.sessionId,
+                        latitude: userLocation ? userLocation.lat : 'N/A',
+                        longitude: userLocation ? userLocation.lng : 'N/A',
+                        accuracy: userLocation ? userLocation.accuracy : 'N/A',
+                        timestamp: attendanceData.timestamp,
+                        userAgent: navigator.userAgent.substring(0, 100)
+                    };
+                    
+                    console.log('Sending to Google Sheets:', payload);
+                    
+                    // Send to Google Apps Script
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams(payload)
+                    });
+                    
+                    // Simulate successful response
+                    setTimeout(() => {
+                        syncSpinner.style.display = 'none';
+                        syncStatus.textContent = 'Attendance sent successfully ✓';
+                        
+                        showNotification('Success!', `Attendance recorded at ${attendanceData.time}`);
+                        
+                        console.log('Data sent successfully to Google Sheets');
+                    }, 1500);
+                    
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Error sending to Google Sheets:', error);
+                    
+                    // Update sync status to error
+                    syncSpinner.style.display = 'none';
+                    syncStatus.textContent = 'Failed to send. Will retry...';
+                    
+                    showNotification('Connection Error', 'Failed to send to Google Sheets. Please try again.', true);
+                    
+                    // Retry after 3 seconds
+                    setTimeout(() => {
+                        sendToGoogleSheets(attendanceData);
+                    }, 3000);
+                    
+                    return false;
+                }
+            }
+            
+            // Mark attendance (only if location is enabled)
+            async function markAttendance() {
+                // Check if location is valid
+                if (!isLocationValid()) {
+                    showNotification('Location Required', 'Valid location data is required. Please enable location.', true);
+                    return;
+                }
+                
+                // Prevent multiple rapid clicks
+                if (attendanceButton.classList.contains('pressed') || 
+                    attendanceButton.classList.contains('sending')) {
+                    return;
+                }
+                
+                // Add visual feedback
+                attendanceButton.classList.add('pressed', 'sending');
+                attendanceButton.innerHTML = '<i class="fas fa-paper-plane"></i><span>SENDING DATA...</span>';
+                
+                // Get current timestamp
+                const now = new Date();
+                isButtonPressed = now;
+                
+                // Format time and date
+                const timeString = now.toLocaleTimeString('en-US', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                const dateString = now.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                const dateTimeString = now.toISOString();
+                // Generate session ID
+                const sessionId = generateSessionId();
+                // Create attendance record
+                const attendanceRecord = {
+                    deviceId: deviceId,
+                    time: timeString,
+                    date: dateString,
+                    dateTime: dateTimeString,
+                    sessionId: sessionId,
+                    timestamp: now.getTime(),
+                    location: userLocation
+                };
+                // Update UI
+                attendanceTimeElement.textContent = timeString;
+                // Show sending status
+                syncSpinner.style.display = 'block';
+                syncStatus.textContent = 'Sending to Google Sheets...';
+                // Send to Google Sheets
+                await sendToGoogleSheets(attendanceRecord);
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    attendanceButton.classList.remove('pressed', 'sending');
+                    attendanceButton.innerHTML = '<i class="fas fa-hand-point-up"></i><span>PUSH-TO-START</span>';
+                    attendanceTimeElement.textContent = '--:--:--';
+                    syncStatus.textContent = 'Ready to mark attendance';
+                }, 3000);
+                // Log the attendance record
+                console.log('Attendance recorded and sent:', attendanceRecord);
+            }
+            // Show notification
+            function showNotification(title, message, isError = false) {
+                notificationTitle.textContent = title;
+                notificationMessage.textContent = message;
+                if (isError) {
+                    notification.classList.add('error');
+                    notificationIcon.className = 'fas fa-exclamation-circle';
+                } else {
+                    notification.classList.remove('error');
+                    notificationIcon.className = 'fas fa-check-circle';
+                }
+                notification.style.display = 'flex';
+                // Hide after 4 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 4000);
+            }
+            // Initialize the application
+            function init() {
+                // Initialize device ID
+                initializeDeviceId();
+                // Start time update
+                updateCurrentTime();
+                setInterval(updateCurrentTime, 1000);
+                // Set up event listeners
+                enableLocationBtn.addEventListener('click', requestLocationAccess);
+                attendanceButton.addEventListener('click', markAttendance);
+                attendanceButton.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    markAttendance();
+                });
+                // Add keyboard shortcut
+                document.addEventListener('keydown', function(e) {
+                    if (e.code === 'Space' || e.code === 'Enter') {
+                        e.preventDefault();
+                        markAttendance();
+                    }
+                });
+                // Log initialization
+                console.log('Attendance System Initialized');
+                console.log('Device ID:', deviceId);
+            }
+            // Start the application
+            init();
+        });
     </script>
   </body>
 </html>
