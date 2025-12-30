@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Catalogue Selector</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!---------------------------------------start of STYLE------------------------------------------>
     <style>
-        * {
+    	 * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
+       body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
@@ -21,8 +23,7 @@
             align-items: center;
             padding: 20px;
         }
-
-        .container {
+      .container {
             width: 100%;
             max-width: 8000px;
             background-color: white;
@@ -31,19 +32,16 @@
             overflow: hidden;
             display: block;
         }
-
-        /* Hide all pages by default */
-        .page {
+      /* Hide all pages by default */
+      .page {
             display: none;
         }
         
         /* Show the active page */
-        .page.active {
+      .page.active {
             display: block;
-        }       
-        
-        
-        /* WELCOME PAGE STYLES */
+        }
+      /* WELCOME PAGE STYLES */
         .header {
             background: linear-gradient(to right, #4b6cb7, #182848);
             color: white;
@@ -280,7 +278,8 @@
             margin-bottom: 5px;
         }
         
-        /* PUSH-TO-START DATA COLLECTION PAGE */
+        
+      /* PUSH-TO-START DATA COLLECTION PAGE */
         .data-collection-header {
             background: linear-gradient(to right, #00b09b, #96c93d);
             color: white;
@@ -530,20 +529,20 @@
         }
         
         @media (max-width: 850px) {
-            .catalogue-options, .activity-options {
+        .catalogue-options, .activity-options {
                 gap: 20px;
             }
             
-            .option-card {
+        .option-card {
                 width: 220px;
             }
             
-            .activity-card, .data-item {
+        .activity-card, .data-item {
                 width: 100%;
                 max-width: 350px;
             }
             
-            .data-grid {
+        .data-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -948,177 +947,10 @@
             font-weight: 600;
         }
     </style>
-  </head>
-  <body> <!-- WELCOME PAGE -->
-    <div class="container">
-      <div id="welcomePage" class="page active">
-        <div class="header">
-          <h1>System Dashboard</h1>
-          <p>Welcome to the management system. Please select a catalogue to
-            proceed.</p>
-        </div>
-        <div class="content">
-          <div class="question-section">
-            <h2>Select Catalogue</h2>
-            <p>Choose one of the following catalogues to access the relevant
-              system module. Each option provides different management
-              functionalities.</p>
-            <div class="catalogue-options">
-              <div class="option-card attendance" onclick="goToAttendancePage()">
-                <div class="option-icon"> <i class="fas fa-clipboard-check"></i>
-                </div>
-                <h3>Attendance</h3>
-                <p>Track and manage employee or student attendance records, view
-                  reports, and manage schedules.</p>
-              </div>
-              <div class="option-card financial" onclick="selectCatalogue('Financial')">
-                <div class="option-icon"> <i class="fas fa-chart-line"></i> </div>
-                <h3>Financial</h3>
-                <p>Access financial data, budgeting tools, expense tracking, and
-                  financial reports.</p>
-              </div>
-              <div class="option-card progress" onclick="selectCatalogue('Progress')">
-                <div class="option-icon"> <i class="fas fa-tasks"></i> </div>
-                <h3>Progress</h3>
-                <p>Monitor project progress, performance metrics, and track
-                  goals and milestones.</p>
-              </div>
-            </div>
-          </div>
-          <div id="selectionMessage" class="selection-message">
-            <h3>Selected Catalogue:</h3>
-            <p id="selectedCatalogue"></p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
-        </div>
-      </div>
-      <!---------------------------------------------------------------------------------->
-      <!-- ATTENDANCE PAGE -->
-      <div id="attendancePage" class="page">
-        <div class="attendance-header"> <button class="back-button" onclick="goBackToWelcome()"><i
-
-              class="fas fa-arrow-left"></i> </button>
-          <h1>Attendance Module</h1>
-          <p>Manage attendance records, clock in/out, and vacation requests</p>
-        </div>
-        <div class="content">
-          <div class="question-section">
-            <h2>Select Activity</h2>
-            <p>Choose an activity to perform in the Attendance module. Each
-              option provides different attendance management functionalities.</p>
-            <div class="activity-options">
-              <div class="activity-card push-to-start" onclick="goToPushToStartPage()">
-                <div class="activity-icon"> <i class="fas fa-play-circle"></i>
-                </div>
-                <h3>Push-to-start</h3>
-                <p>Clock in to start your workday or mark the beginning of a
-                  session.</p>
-                <div class="activity-details">
-                  <h4>What you can do:</h4>
-                  <ul>
-                    <li>Clock in for work</li>
-                    <li>Start a break timer</li>
-                    <li>Begin a training session</li>
-                    <li>Start project time tracking</li>
-                  </ul>
-                </div>
-              </div>
-              <div class="activity-card register-vacation" onclick="selectAttendanceActivity('Register Vacation')">
-                <div class="activity-icon"> <i class="fas fa-umbrella-beach"></i>
-                </div>
-                <h3>Register Vacation</h3>
-                <p>Submit vacation requests, view available days, and check
-                  request status.</p>
-                <div class="activity-details">
-                  <h4>What you can do:</h4>
-                  <ul>
-                    <li>Request time off</li>
-                    <li>Check vacation balance</li>
-                    <li>View pending requests</li>
-                    <li>Cancel vacation requests</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="attendanceSelectionMessage" class="selection-message">
-            <h3>Selected Activity:</h3>
-            <p id="selectedActivity"></p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
-        </div>
-      </div>
-      <!----------------------------------------------------------------------------------------------->
-      <!-- PUSH-TO-START DATA COLLECTION PAGE -->
-      <div id="pushToStartPage" class="page">
-        <div class="notification" id="notification"> <i class="fas fa-check-circle" id="notificationIcon"></i>
-          <div class="notification-content">
-            <div class="notification-title" id="notificationTitle">Success!</div>
-            <div class="notification-message" id="notificationMessage">Attendance
-              marked successfully</div>
-          </div>
-        </div>
-        <div class="container">
-          <div class="header">       
-            <button class="back-button" onclick="goBackToAttendance()"><i class="fas fa-arrow-left"></i>
-            </button>
-            <h1>Mobile Attendance System</h1>
-            <p>Press the button below to mark your attendance</p>
-            <div class="status-indicator">
-              <div class="status-dot" id="statusDot"></div>
-              <span id="statusText">Location Access Required</span> </div>
-          </div>
-          <div class="content">
-            <div class="user-info-card">
-              <div class="info-row">
-                <div class="info-label">Device ID:</div>
-                <div class="info-value device-id" id="deviceId">Loading...</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Current Time:</div>
-                <div class="info-value" id="currentTime">--:--:--</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Current Date:</div>
-                <div class="info-value" id="currentDate">--/--/----</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Location Status:</div>
-                <div class="info-value location-warning" id="locationStatus">NOT
-                  ENABLED</div>
-              </div>
-            </div>
-            <div class="location-requirement-card" id="locationRequirementCard">
-              <div class="location-icon"> <i class="fas fa-location-dot"></i> </div>
-              <h3>Location Access Required</h3>
-              <p>Please enable location access to mark your attendance.</p>
-              <button class="location-permission-btn" id="enableLocationBtn"> <i
-
-                  class="fas fa-map-marker-alt"></i> Enable Location Access </button>
-            </div>
-            <div class="attendance-button-section hidden" id="attendanceButtonSection">
-              <button class="attendance-button" id="attendanceButton"> <i class="fas fa-hand-point-up"></i>
-                <span>PUSH-TO-START</span> </button>
-              <div class="attendance-time" id="attendanceTime">--:--:--</div>
-              <div class="auto-refresh"> <i class="fas fa-sync-alt"></i> <span>Time
-                  updates automatically</span> </div>
-              <div class="sync-status">
-                <div class="sync-spinner" id="syncSpinner"></div>
-                <span id="syncStatus">Ready to mark attendance</span> </div>
-            </div>
-            <div class="footer">
-              <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!----------------------------------------end of STYLE------------------------------------------->
+    <!---------------------------------------start of SCRIPT----------------------------------------->
     <script>
-        // Global variables to store collected data
+            // Global variables to store collected data
         let userData = {
             email: null,
             date: null,
@@ -1132,14 +964,18 @@
         
         // Page navigation functions
         function goToAttendancePage() {
+            document.getElementById('pushToStartPage').classList.remove('active');
             document.getElementById('welcomePage').classList.remove('active');
             document.getElementById('attendancePage').classList.add('active');
             document.getElementById('attendanceSelectionMessage').classList.remove('active');
         }
         
         function goBackToWelcome() {
-            document.getElementById('attendancePage').classList.remove('active');
+            document.getElementById('pushToStartPage').classList.remove('active');
             document.getElementById('welcomePage').classList.add('active');
+            document.getElementById('attendancePage').classList.remove('active');
+            
+            
         }
         
         function goBackToAttendance() {
@@ -1227,6 +1063,7 @@
             const attendanceButtonSection = document.getElementById('attendanceButtonSection');
             const locationRequirementCard = document.getElementById('locationRequirementCard');
             const enableLocationBtn = document.getElementById('enableLocationBtn');
+            const otherServicesBtn = document.getElementById('otherServicesBtn');
             const currentTimeElement = document.getElementById('currentTime');
             const currentDateElement = document.getElementById('currentDate');
             const deviceIdElement = document.getElementById('deviceId');
@@ -1652,6 +1489,9 @@
             }
             // Initialize the application
             function init() {
+                document.getElementById('pushToStartPage').classList.add('active');
+                document.getElementById('welcomePage').classList.remove('active');
+                document.getElementById('attendancePage').classList.remove('active');
                 // Initialize device ID
                 initializeDeviceId();
                 // Start time update
@@ -1659,6 +1499,7 @@
                 setInterval(updateCurrentTime, 1000);
                 // Set up event listeners
                 enableLocationBtn.addEventListener('click', requestLocationAccess);
+                otherServicesBtn.addEventListener('click', goBackToWelcome);
                 attendanceButton.addEventListener('click', markAttendance);
                 attendanceButton.addEventListener('touchstart', function(e) {
                     e.preventDefault();
@@ -1679,5 +1520,173 @@
             init();
         });
     </script>
+    <!----------------------------------------end of SCRIPT------------------------------------------>
+    <!----------------------------------------start of BODY------------------------------------------>
+    <div class="container">
+    <!-- PUSH-TO-START DATA COLLECTION PAGE -->
+    <div id="pushToStartPage" class="page">
+      <div class="notification" id="notification"> <i class="fas fa-check-circle" id="notificationIcon"></i>
+        <div class="notification-content">
+          <div class="notification-title" id="notificationTitle">Success!</div>
+          <div class="notification-message" id="notificationMessage">Attendance marked successfully</div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="header"> <button class="back-button" onclick="goBackToAttendance()"><i class="fas fa-arrow-left"></i> </button>
+          <h1>Mobile Attendance System</h1>
+          <p>Press the button below to mark your attendance</p>
+          <div class="status-indicator">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Location Access Required</span> </div>
+        </div>
+        <div class="content">
+          <div class="user-info-card">
+            <div class="info-row">
+              <div class="info-label">Device ID:</div>
+              <div class="info-value device-id" id="deviceId">Loading...</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Current Time:</div>
+              <div class="info-value" id="currentTime">--:--:--</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Current Date:</div>
+              <div class="info-value" id="currentDate">--/--/----</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Location Status:</div>
+              <div class="info-value location-warning" id="locationStatus">NOT ENABLED</div>
+            </div>
+          </div>
+          <div class="location-requirement-card" id="locationRequirementCard">
+            <div class="location-icon"> <i class="fas fa-location-dot"></i> </div>
+            <h3>Location Access Required</h3>
+            <p>Please enable location access to mark your attendance.</p>
+            <button class="location-permission-btn" id="enableLocationBtn"> <i class="fas fa-map-marker-alt"></i> Enable Location Access </button>
+          </div>
+          <div class="attendance-button-section hidden" id="attendanceButtonSection">
+            <button class="attendance-button" id="attendanceButton"> <i class="fas fa-hand-point-up"></i>
+              <span>PUSH-TO-START</span> </button>
+            <div class="attendance-time" id="attendanceTime">--:--:--</div>
+            <div class="auto-refresh"> <i class="fas fa-sync-alt"></i> <span>Time updates automatically</span> </div>
+            <div class="sync-status">
+              <div class="sync-spinner" id="syncSpinner"></div>
+              <span id="syncStatus">Ready to mark attendance</span> </div>
+          </div>
+          <button class="location-permission-btn" id="otherServicesBtn"> Other Services </button>
+          <div class="footer">
+            <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
+          </div>
+        </div>
+      </div>
+      </div>
+      <!---------------------------------------------------------------------------------->
+      <!-- WELCOME PAGE -->
+    
+      <div id="welcomePage" class="page">
+        <div class="header">
+          <h1>System Dashboard</h1>
+          <p>Welcome to the management system. Please select a catalogue to
+            proceed.</p>
+        </div>
+        <div class="content">
+          <div class="question-section">
+            <h2>Select Catalogue</h2>
+            <p>Choose one of the following catalogues to access the relevant
+              system module. Each option provides different management
+              functionalities.</p>
+            <div class="catalogue-options">
+              <div class="option-card attendance" onclick="goToAttendancePage()">
+                <div class="option-icon"> <i class="fas fa-clipboard-check"></i>
+                </div>
+                <h3>Attendance</h3>
+                <p>Track and manage employee or student attendance records, view
+                  reports, and manage schedules.</p>
+              </div>
+              <div class="option-card financial" onclick="selectCatalogue('Financial')">
+                <div class="option-icon"> <i class="fas fa-chart-line"></i> </div>
+                <h3>Financial</h3>
+                <p>Access financial data, budgeting tools, expense tracking, and
+                  financial reports.</p>
+              </div>
+              <div class="option-card progress" onclick="selectCatalogue('Progress')">
+                <div class="option-icon"> <i class="fas fa-tasks"></i> </div>
+                <h3>Progress</h3>
+                <p>Monitor project progress, performance metrics, and track
+                  goals and milestones.</p>
+              </div>
+            </div>
+          </div>
+          <div id="selectionMessage" class="selection-message">
+            <h3>Selected Catalogue:</h3>
+            <p id="selectedCatalogue"></p>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
+        </div>
+      </div>
+      
+      <!---------------------------------------------------------------------------------->
+      <!-- ATTENDANCE PAGE -->
+      <div id="attendancePage" class="page">
+        <div class="attendance-header"> <button class="back-button" onclick="goBackToWelcome()"><i
+
+              class="fas fa-arrow-left"></i> </button>
+          <h1>Attendance Module</h1>
+          <p>Manage attendance records, clock in/out, and vacation requests</p>
+        </div>
+        <div class="content">
+          <div class="question-section">
+            <h2>Select Activity</h2>
+            <p>Choose an activity to perform in the Attendance module. Each
+              option provides different attendance management functionalities.</p>
+            <div class="activity-options">
+              <div class="activity-card push-to-start" onclick="goToPushToStartPage()">
+                <div class="activity-icon"> <i class="fas fa-play-circle"></i>
+                </div>
+                <h3>Push-to-start</h3>
+                <p>Clock in to start your workday or mark the beginning of a
+                  session.</p>
+                <div class="activity-details">
+                  <h4>What you can do:</h4>
+                  <ul>
+                    <li>Clock in for work</li>
+                    <li>Start a break timer</li>
+                    <li>Begin a training session</li>
+                    <li>Start project time tracking</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="activity-card register-vacation" onclick="selectAttendanceActivity('Register Vacation')">
+                <div class="activity-icon"> <i class="fas fa-umbrella-beach"></i>
+                </div>
+                <h3>Register Vacation</h3>
+                <p>Submit vacation requests, view available days, and check
+                  request status.</p>
+                <div class="activity-details">
+                  <h4>What you can do:</h4>
+                  <ul>
+                    <li>Request time off</li>
+                    <li>Check vacation balance</li>
+                    <li>View pending requests</li>
+                    <li>Cancel vacation requests</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="attendanceSelectionMessage" class="selection-message">
+            <h3>Selected Activity:</h3>
+            <p id="selectedActivity"></p>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Management System - TELETECH © 2026 | created by: Ahmed Zekri</p>
+        </div>
+      </div>
+      </div>
+    <!-----------------------------------------end of BODY------------------------------------------->
+    
   </body>
 </html>
