@@ -1,7 +1,7 @@
 // Google Sheets Configuration
-const CLIENT_ID = "1045013044828-g2hvpqced1tpmbdflq765j70shiog376.apps.googleusercontent.com"; // Get from Google Cloud Console
-const API_KEY = "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"; // Get from Google Cloud Console
-const SPREADSHEET_ID = "https://docs.google.com/spreadsheets/d/11qES0V58qZcI0rRCZRkznkZqET7A4f_4oKHFtyVLPYw/edit"; // Get from your Google Sheet URL
+const CLIENT_ID = '1045013044828-g2hvpqced1tpmbdflq765j70shiog376.apps.googleusercontent.com'; // Get from Google Cloud Console
+const API_KEY = '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'; // Get from Google Cloud Console
+const SPREADSHEET_ID = 'https://docs.google.com/spreadsheets/d/11qES0V58qZcI0rRCZRkznkZqET7A4f_4oKHFtyVLPYw/edit'; // Get from your Google Sheet URL
 const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
