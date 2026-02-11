@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Work Logger · Register with NID · Location Required</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(145deg, #eef2f7, #e2e8f0);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .container {
+            max-width: 600px; width: 100%; background: white; border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); padding: 36px 28px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        h1 { font-size: 2rem; color: #0f2c3d; margin-bottom: 12px; font-weight: 700; }
+        .badge {
+            background: #e6f0f5; padding: 12px 20px; border-radius: 100px; font-size: 0.95rem;
+            color: #1f5068; border-left: 4px solid #2c7da0; margin: 20px 0;
+        }
+        .btn {
+            border: none; padding: 16px 28px; border-radius: 60px; font-size: 1.1rem;
+            font-weight: 600; cursor: pointer; transition: all 0.15s; display: flex;
+            align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(0,0,0,0.02);
+        }
+        .btn-primary { background: #1e4a6b; color: white; flex: 1; box-shadow: 0 8px 16px rgba(30,74,107,0.25); }
+        .btn-primary:hover { background: #256f94; transform: scale(0.98); }
+        .btn-primary:disabled { background: #a0b9c9; transform: none; box-shadow: none; cursor: not-allowed; }
+        .btn-secondary { background: #f0f4f8; color: #1e4a6b; flex: 1; }
+        .btn-secondary:hover { background: #e2eaf1; }
+        .button-row { display: flex; gap: 16px; margin: 24px 0; }
+        input {
+            width: 100%; padding: 16px 22px; font-size: 1.1rem; border: 2px solid #d0dfe8;
+            border-radius: 50px; margin: 8px 0 20px; outline: none;
+        }
+        input:focus { border-color: #2c7da0; box-shadow: 0 0 0 4px rgba(44,125,160,0.1); }
+        .status {
+            background: #f0f6fa; padding: 16px 22px; border-radius: 30px; margin-top: 24px;
+            color: #1e4a6b; border-left: 6px solid #2c7da0; word-break: break-word;
+        }
+        .hidden { display: none; }
+        .register-box { background: #f8fafc; padding: 28px; border-radius: 32px; margin-top: 16px; }
+        .error { color: #b34141; font-size: 0.95rem; margin-top: 8px; }
+        .location-prompt {
+            background: #fff8e7; border-left: 6px solid #ed8a3c; padding: 16px 22px;
+            border-radius: 30px; margin: 20px 0; display: flex; align-items: center; gap: 12px;
+        }
+        .location-allowed { background: #e3f2ed; border-left-color: #2e7d32; }
+        .nid-warning {
+            background: #fff3e0; border-left: 6px solid #ed8a3c; padding: 16px 22px;
+            border-radius: 30px; margin: 20px 0; display: flex; align-items: center; gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Dynamic content will be rendered here -->
+    </div>
+
+    <script>
+        // 🔴 REPLACE WITH YOUR ACTUAL WEB APP URL (Google Apps Script)
+        const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw1hIxGZXrjdf6izCMBwO98BuGZnYB3Q4I26QciCixTesJsLoZEmbcMjJyDLWMVopfp/exec';
+        
+        // Storage keys
+        const DEVICE_ID_KEY = 'work_device_id';
+        const NID_STORAGE_KEY = 'registered_nid';
+        
+        // Global state
+        let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+        let registeredNid = localStorage.getItem(NID_STORAGE_KEY) || null;
+        let locationPermission = false;
+        let lastLocationString = null;
+
+        // ========== INIT ==========
+        async function init() {
+            await checkLocationPermission();
+            renderWelcome();
+        }
+
+        // ========== LOCATION ==========
+        async function checkLocationPermission() {
+            if (!navigator.geolocation) {
+                locationPermission = false;
+                return false;
+            }
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 15000,
+                        enableHighAccuracy: true
+                    });
+                });
+                locationPermission = true;
+                lastLocationString = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+                return true;
+            } catch (err) {
+                locationPermission = false;
+                lastLocationString = null;
+                return false;
+            }
+        }
+
+        async function requestLocationPermission() {
+            if (!navigator.geolocation) return false;
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 7000,
+                        enableHighAccuracy: true
+                    });
+                });
+                locationPermission = true;
+                lastLocationString = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+                return true;
+            } catch (err) {
+                locationPermission = false;
+                lastLocationString = null;
+                return false;
+            }
+        }
+
+        async function getGeolocationCached() {
+            if (locationPermission && lastLocationString) {
+                return lastLocationString;
+            }
+            if (locationPermission) {
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    const loc = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+                    lastLocationString = loc;
+                    return loc;
+                } catch {
+                    return 'Location unavailable';
+                }
+            }
+            return 'Location denied';
+        }
+
+        // ========== DEVICE ID ==========
+        function generateDeviceId() {
+            const timestamp = Date.now().toString(36).toUpperCase();
+            const random = Math.random().toString(36).substring(2, 10).toUpperCase();
+            return (timestamp + random).slice(0, 14).padEnd(14, '0');
+        }
+
+        // ========== SHEET LOGGING ==========
+        async function sendToSheet(rowData) {
+            try {
+                console.log('Sending to sheet:', rowData);
+                await fetch(SHEET_WEBAPP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ values: rowData })
+                });
+                return { success: true };
+            } catch (error) {
+                console.error('Send error:', error);
+                throw error;
+            }
+        }
+
+        // ========== RENDER: WELCOME ==========
+        function renderWelcome() {
+            const hasDevice = deviceId !== null;
+            const locationEnabled = locationPermission === true;
+            
+            // ---------- Location Badge or Enable Prompt ----------
+            let locationBadge = '';
+            if (locationEnabled) {
+                locationBadge = `<div class="badge location-allowed" style="background:#e3f2ed; border-left-color:#2e7d32;">
+                    <span>📍 Location: <strong>Enabled</strong> (${lastLocationString || 'ready'})</span>
+                </div>`;
+            } else {
+                locationBadge = `<div class="location-prompt">
+                    <span style="font-size:1.5rem;">📍</span>
+                    <div style="flex:1;"><strong>Location required</strong><br>Please enable location to use Start/Finish Work.</div>
+                    <button id="enableLocationBtn" class="btn" style="background:#ed8a3c; color:white; padding:12px 20px; border-radius:40px;">Enable</button>
+                </div>`;
+            }
+
+            // ---------- NID / Device Registration Prompt (if no device) ----------
+            let registrationPrompt = '';
+            if (!hasDevice) {
+                registrationPrompt = `<div class="nid-warning">
+                    <span style="font-size:1.5rem;">🆔</span>
+                    <div style="flex:1;"><strong>No device registered</strong><br>Please register your 14-digit NID to create a device ID.</div>
+                    <button id="registerRedirectBtn" class="btn" style="background:#1e4a6b; color:white; padding:12px 20px; border-radius:40px;">Register</button>
+                </div>`;
+            }
+
+            // ---------- Main Welcome Render ----------
+            document.getElementById('app').innerHTML = `
+                <div>
+                    <h1>⏱️ Work Logger</h1>
+                    <p style="color: #3c6e71; margin-bottom: 16px;">📍 Location must be enabled for work events</p>
+                    
+                    ${hasDevice ? 
+                        `<div class="badge">
+                            <span style="font-weight:bold;">🖥️ DEVICE ID:</span> ${deviceId}
+                        </div>` : 
+                        ''
+                    }
+                    
+                    ${registrationPrompt}  <!-- This shows when NO DEVICE ID exists -->
+                    ${locationBadge}
+                    
+                    <div class="button-row">
+                        <button class="btn btn-primary" id="startBtn" ${!hasDevice || !locationEnabled ? 'disabled' : ''}>
+                            📋 Start/Finish Work
+                        </button>
+                        <button class="btn btn-secondary" id="otherBtn">🔧 Other Services</button>
+                    </div>
+                    
+                    <div id="statusMessage" class="status hidden"></div>
+                    
+                    <p style="font-size:0.8rem; color:#5f7d95; margin-top:24px; text-align:center;">
+                        Device ID stored in browser. Location permission required for work events.
+                    </p>
+                </div>
+            `;
+
+            // ---------- Attach Event Listeners ----------
+            document.getElementById('startBtn')?.addEventListener('click', handleWork);
+            document.getElementById('otherBtn')?.addEventListener('click', handleOther);
+            
+            const enableBtn = document.getElementById('enableLocationBtn');
+            if (enableBtn) {
+                enableBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const btn = e.currentTarget;
+                    btn.textContent = 'Requesting...';
+                    btn.disabled = true;
+                    
+                    const granted = await requestLocationPermission();
+                    if (granted) {
+                        renderWelcome();
+                    } else {
+                        alert('❌ Location permission denied. Please enable location in your browser settings.');
+                        renderWelcome();
+                    }
+                });
+            }
+
+            // 🔥 THIS IS THE KEY: Redirect to registration page when "Register" button is clicked
+            const registerRedirectBtn = document.getElementById('registerRedirectBtn');
+            if (registerRedirectBtn) {
+                registerRedirectBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    renderRegisterNID();
+                });
+            }
+        }
+
+        // ========== RENDER: REGISTER NID PAGE ==========
+        function renderRegisterNID() {
+            document.getElementById('app').innerHTML = `
+                <div>
+                    <h1>🆔 Device Registration</h1>
+                    <p style="color: #3c6e71; margin-bottom: 24px;">
+                        No device ID found. Please enter your 14-digit National ID (NID) to register this device.
+                    </p>
+                    
+                    <div class="register-box">
+                        <label style="font-weight:600; color:#1e4a6b;">🏛️ National ID (NID)</label>
+                        <input type="text" id="nidInput" maxlength="14" placeholder="14 digits, e.g. 12345678901234" inputmode="numeric" autofocus>
+                        
+                        <div class="button-row">
+                            <button class="btn btn-primary" id="registerBtn">✔️ Register & Create Device ID</button>
+                            <button class="btn btn-secondary" id="backBtn">← Back</button>
+                        </div>
+                        
+                        <div id="registerError" class="error"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('registerBtn').addEventListener('click', handleRegister);
+            document.getElementById('backBtn').addEventListener('click', () => renderWelcome());
+        }
+
+        // ========== RENDER: OTHER SERVICES (EMPTY) ==========
+        function renderOther() {
+            document.getElementById('app').innerHTML = `
+                <div style="text-align:center; padding:20px 0;">
+                    <div style="font-size:4rem; margin-bottom:20px;">🛠️</div>
+                    <h2 style="color:#1e4a6b; margin-bottom:16px;">Other Services</h2>
+                    <p style="color:#3c6e71; margin-bottom:32px;">This page is intentionally empty for now.</p>
+                    <button class="btn btn-primary" id="backBtn" style="margin:0 auto;">← Back to Welcome</button>
+                </div>
+            `;
+            document.getElementById('backBtn').addEventListener('click', () => renderWelcome());
+        }
+
+        // ========== HANDLE: REGISTRATION ==========
+        async function handleRegister() {
+            const nidInput = document.getElementById('nidInput');
+            const errorEl = document.getElementById('registerError');
+            const nid = nidInput.value.trim();
+            
+            // Validate exactly 14 digits
+            if (!/^\d{14}$/.test(nid)) {
+                errorEl.textContent = '❌ Please enter exactly 14 numeric digits.';
+                return;
+            }
+            
+            // Generate new device ID
+            const newDeviceId = generateDeviceId();
+            
+            // Save to localStorage (device memory)
+            localStorage.setItem(DEVICE_ID_KEY, newDeviceId);
+            localStorage.setItem(NID_STORAGE_KEY, nid);
+            
+            // Update global state
+            deviceId = newDeviceId;
+            registeredNid = nid;
+            
+            errorEl.textContent = '⏳ Registering device and sending to Google Sheets...';
+            errorEl.style.color = '#1e4a6b';
+            
+            try {
+                // Log registration event to Google Sheets
+                const now = new Date();
+                const date = now.toLocaleDateString('en-CA');
+                const time = now.toLocaleTimeString('en-GB', { hour12: false });
+                
+                const row = [date, time, newDeviceId, `NID: ${nid}`, 'DEVICE_REGISTRATION'];
+                await sendToSheet(row);
+                
+                errorEl.textContent = '✅ Device registered successfully! Redirecting to welcome...';
+                errorEl.style.color = '#2e7d32';
+                
+                // Return to welcome page after short delay
+                setTimeout(() => renderWelcome(), 1500);
+                
+            } catch (error) {
+                console.warn('Sheet logging failed, but device ID saved locally.');
+                errorEl.textContent = '⚠️ Device ID saved locally, but Google Sheet update failed. You can still proceed.';
+                errorEl.style.color = '#b85c1a';
+                
+                // Still redirect to welcome page
+                setTimeout(() => renderWelcome(), 2000);
+            }
+        }
+
+        // ========== HANDLE: WORK START/FINISH ==========
+        async function handleWork() {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.classList.remove('hidden');
+            
+            // Double-check device ID and location (button is disabled otherwise, but safe check)
+            if (!deviceId) {
+                statusEl.innerHTML = '⚠️ No device ID. Redirecting to registration...';
+                statusEl.style.background = '#ffebee';
+                setTimeout(() => renderRegisterNID(), 1500);
+                return;
+            }
+            
+            if (!locationPermission) {
+                statusEl.innerHTML = '❌ Location not enabled. Please enable location first.';
+                statusEl.style.background = '#ffebee';
+                return;
+            }
+            
+            try {
+                statusEl.innerHTML = '📍 Getting location...';
+                const location = await getGeolocationCached();
+                
+                const now = new Date();
+                const date = now.toLocaleDateString('en-CA');
+                const time = now.toLocaleTimeString('en-GB', { hour12: false });
+                
+                statusEl.innerHTML = '📤 Sending to Google Sheets...';
+                
+                const row = [date, time, deviceId, location, 'WORK_EVENT'];
+                await sendToSheet(row);
+                
+                statusEl.innerHTML = '✅ Work event recorded! ✓ Date, Time, Device ID, Location';
+                statusEl.style.background = '#e3f2ed';
+                
+            } catch (error) {
+                statusEl.innerHTML = '❌ Error: ' + error.message;
+                statusEl.style.background = '#ffebee';
+            }
+        }
+
+        // ========== HANDLE: OTHER SERVICES ==========
+        function handleOther() {
+            renderOther();
+        }
+
+        // ========== START ==========
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
