@@ -91,19 +91,7 @@
             renderWelcome();
         }
 
-        function compareLocations(locations) {
-            if (!locations.gps || !locations.network) return
-  
-            const distance = calculateDistance(
-            locations.gps.coords,
-            locations.network.coords
-            )
-  
-            // If GPS and network locations are very different
-            if (distance > 1000) { // More than 1km difference
-            alert('Fake GPS')
-            }
-        }
+        
         // ========== STRICT GPS: VALIDATE, REJECT FAKE, LOG VIOLATIONS ==========
         async function attemptRealGps() {
             if (!navigator.geolocation) {
@@ -117,7 +105,7 @@
             null,
             { enableHighAccuracy: true }
             )
-            alert("GPS")
+            alert("GPS!")
             // Network-based location (lower accuracy)
             navigator.geolocation.getCurrentPosition(
             (pos) => { 
@@ -127,7 +115,7 @@
             null,
             { enableHighAccuracy: false }
             )
-            alert("Network")
+            alert("Network!")
 
             try {
                 // Request high accuracy GPS with no cached positions
@@ -492,6 +480,19 @@
             renderOther();
         }
 
+        function compareLocations(locations) {
+            if (!locations.gps || !locations.network) return
+  
+            const distance = calculateDistance(
+            locations.gps.coords,
+            locations.network.coords
+            )
+  
+            // If GPS and network locations are very different
+            if (distance > 1000) { // More than 1km difference
+            alert('Fake GPS')
+            }
+        }
         // ========== START ==========
         window.addEventListener('DOMContentLoaded', init);
     </script>
