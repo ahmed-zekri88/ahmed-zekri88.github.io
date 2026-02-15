@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Work Logger · Anti-Fake GPS · Violation Logger</title>
+    <title>T E L E T E C H</title>
     <style>
         * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
         body {
@@ -224,7 +224,7 @@
             let gpsBadge = '';
             if (hasGps) {
                 gpsBadge = `<div class="badge location-allowed" style="background:#e3f2ed; border-left-color:#2e7d32;">
-                    <span>🛰️ REAL GPS: <strong>ACTIVE</strong></span>
+                    <span>🛰️ Location: <strong>ACTIVE</strong></span>
                     <div style="font-size:0.85rem; margin-top:6px;">
                         📍 ${lastRealGpsString}<br>
                         🎯 Accuracy: ${gpsAccuracy}m · ${new Date(gpsTimestamp).toLocaleTimeString()}
@@ -234,7 +234,7 @@
                 gpsBadge = `<div class="location-prompt">
                     <span style="font-size:1.5rem;">🛰️</span>
                     <div style="flex:1;">
-                        <strong>Real GPS required</strong><br>
+                        <strong>GPS required</strong><br>
                         • No fake GPS apps<br>
                         • No network/wifi locations<br>
                         • Accuracy ≤ 30 meters<br>
@@ -257,8 +257,7 @@
             // ---------- Main Render ----------
             document.getElementById('app').innerHTML = `
                 <div>
-                    <h1>⏱️ Work Logger</h1>
-                    <p style="color: #3c6e71; margin-bottom: 16px;">🛰️ ANTI-FAKE GPS · Violations reported</p>
+                    <h1>⏱️ TeleTech attendance</h1>
                     
                     ${hasDevice ? 
                         `<div class="badge">
@@ -272,7 +271,7 @@
                     
                     <div class="button-row">
                         <button class="btn btn-primary" id="startBtn" ${!hasDevice || !hasGps ? 'disabled' : ''}>
-                            📋 Start/Finish Work
+                            📋 Start / Finish Work
                         </button>
                         <button class="btn btn-secondary" id="otherBtn">🔧 Other Services</button>
                     </div>
@@ -280,7 +279,7 @@
                     <div id="statusMessage" class="status hidden"></div>
                     
                     <p style="font-size:0.8rem; color:#5f7d95; margin-top:24px; text-align:center;">
-                        ⚠️ Fake GPS, network location, or accuracy >30m = automatic violation report
+                        TeleTech - 2026 - Created by Ahmed Zekri
                     </p>
                 </div>
             `;
@@ -339,6 +338,9 @@
                         
                         <div id="registerError" class="error"></div>
                     </div>
+                    <p style="font-size:0.8rem; color:#5f7d95; margin-top:24px; text-align:center;">
+                        TeleTech - 2026 - Created by Ahmed Zekri
+                    </p>
                 </div>
             `;
             
@@ -354,6 +356,9 @@
                     <h2 style="color:#1e4a6b; margin-bottom:16px;">Other Services</h2>
                     <p style="color:#3c6e71; margin-bottom:32px;">This page is intentionally empty.</p>
                     <button class="btn btn-primary" id="backBtn" style="margin:0 auto;">← Back to Welcome</button>
+                    <p style="font-size:0.8rem; color:#5f7d95; margin-top:24px; text-align:center;">
+                        TeleTech - 2026 - Created by Ahmed Zekri
+                    </p>
                 </div>
             `;
             document.getElementById('backBtn').addEventListener('click', () => renderWelcome());
