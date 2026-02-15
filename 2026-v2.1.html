@@ -69,8 +69,7 @@
     </div>
 
     <script>
-        import { MockLocation } from '@dewakoding/capacitor-mock-location'
-        import JailMonkey from 'jail-monkey'
+        
         // 🔴 REPLACE WITH YOUR ACTUAL WEB APP URL (Google Apps Script)
         const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw1hIxGZXrjdf6izCMBwO98BuGZnYB3Q4I26QciCixTesJsLoZEmbcMjJyDLWMVopfp/exec';
         
@@ -156,10 +155,8 @@
                     },
                     null,
                     { enableHighAccuracy: false }
-                    )
+                )
             
-
-
                 if (coords.mock === true || coords.mock === 'true' || position.mock === true) {
                     isViolation = true;
                     violationReason = 'MOCK_LOCATION_DETECTED';
@@ -513,6 +510,8 @@
 
         // ========== START ==========
         window.addEventListener('DOMContentLoaded', init);
+        import { MockLocation } from '@dewakoding/capacitor-mock-location'
+        import JailMonkey from 'jail-monkey'
     </script>
 </body>
 </html>
