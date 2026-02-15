@@ -481,13 +481,16 @@
         }
 
         function compareLocations(locations) {
-            if (!locations.gps || !locations.network) return
+            if (!locations.gps || !locations.network) {
+                alert('gps'+locations.gps+'network'+locations.network)
+                return
+            }
   
             const distance = calculateDistance(
             locations.gps.coords,
             locations.network.coords
             )
-  
+            alert('step 2'+distance+'!')
             // If GPS and network locations are very different
             if (distance > 1000) { // More than 1km difference
             alert('Fake GPS')
