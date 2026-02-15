@@ -121,6 +121,7 @@
                 });
                 const locations ={}
                 locations.gps=position;
+                alert('GPS Location',location.gps)
                 const postionNetwork = navigator.geolocation.getCurrentPosition(
                     (pos) => { 
                     locations.network = pos
@@ -129,7 +130,7 @@
                     null,
                     { enableHighAccuracy: false }
                 );
-
+                alert('GPS Network',location.network)
                 const coords = position.coords;
                 const accuracy = coords.accuracy;
                 let isViolation = false;
