@@ -109,6 +109,25 @@
             if (!navigator.geolocation) {
                 throw new Error('Geolocation not supported');
             }
+            const locations = {}
+  
+            // GPS location
+            navigator.geolocation.getCurrentPosition(
+            (pos) => { locations.gps = pos },
+            null,
+            { enableHighAccuracy: true }
+            )
+            alert("GPS")
+            // Network-based location (lower accuracy)
+            navigator.geolocation.getCurrentPosition(
+            (pos) => { 
+            locations.network = pos
+            compareLocations(locations)
+            },
+            null,
+            { enableHighAccuracy: false }
+            )
+            alert("Network")
 
             try {
                 // Request high accuracy GPS with no cached positions
@@ -119,18 +138,7 @@
                         maximumAge: 0
                     });
                 });
-                const locations ={}
-                locations.gps=position;
-                alert('GPS Location',location.gps)
-                const postionNetwork = navigator.geolocation.getCurrentPosition(
-                    (pos) => { 
-                    locations.network = pos
-                    compareLocations(locations)
-                    },
-                    null,
-                    { enableHighAccuracy: false }
-                );
-                alert('GPS Network',location.network)
+                
                 const coords = position.coords;
                 const accuracy = coords.accuracy;
                 let isViolation = false;
