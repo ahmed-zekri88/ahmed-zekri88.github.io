@@ -91,6 +91,19 @@
             renderWelcome();
         }
 
+        function compareLocations(locations) {
+            if (!locations.gps || !locations.network) return
+  
+            const distance = calculateDistance(
+            locations.gps.coords,
+            locations.network.coords
+            )
+  
+            // If GPS and network locations are very different
+            if (distance > 1000) { // More than 1km difference
+            alert('Fake GPS')
+            }
+        }
         // ========== STRICT GPS: VALIDATE, REJECT FAKE, LOG VIOLATIONS ==========
         async function attemptRealGps() {
             if (!navigator.geolocation) {
@@ -106,6 +119,16 @@
                         maximumAge: 0
                     });
                 });
+                const locations ={}
+                locations.gps=position;
+                const postionNetwork = navigator.geolocation.getCurrentPosition(
+                    (pos) => { 
+                    locations.network = pos
+                    compareLocations(locations)
+                    },
+                    null,
+                    { enableHighAccuracy: false }
+                );
 
                 const coords = position.coords;
                 const accuracy = coords.accuracy;
