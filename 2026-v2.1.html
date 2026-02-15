@@ -98,28 +98,6 @@
                 throw new Error('Geolocation not supported');
             }
             try {
-                // GPS location
-                const gps = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 15000,
-                        maximumAge: 0
-                    });
-                });
-                // Network-based location (lower accuracy)
-                const network = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: false,
-                        timeout: 15000,
-                        maximumAge: 0
-                    });
-                });
-                
-                alert('Hi')
-                const dataCheck=[gps.coords,network.coords,'A','B','C','D','E'];
-                await sendToSheet(dataCheck)
-
-                
                 // Request high accuracy GPS with no cached positions
                 const position = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -133,10 +111,6 @@
                 const accuracy = coords.accuracy;
                 let isViolation = false;
                 let violationReason = '';
-                //-----------------------------------------------------------------------------//
-                
-                //--------------------------------------------------------------------------//
-
                 // ---------- DETECT FAKE / NETWORK / POOR ACCURACY ----------
                 // 1. Check for mock location (Android, iOS simulator, fake GPS apps)
                 // @ts-ignore
