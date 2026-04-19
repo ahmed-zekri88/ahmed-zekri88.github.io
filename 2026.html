@@ -120,14 +120,14 @@
                 }
                 
                 // 2. Check accuracy threshold (network locations usually > 30m)
-                else if (accuracy > 30) {
+                else if (accuracy > 200) {
                     isViolation = true;
                     violationReason = `ACCURACY_TOO_LOW_${accuracy.toFixed(1)}m`;
                 }
                 
                 // 3. Additional heuristic: real GPS typically provides altitude and speed
                 // If both are null and accuracy > 20, likely network
-                else if (coords.altitude === null && coords.speed === null && accuracy > 20) {
+                else if (coords.altitude === null && coords.speed === null && accuracy > 200) {
                     isViolation = true;
                     violationReason = `SUSPECTED_NETWORK_LOCATION_${accuracy.toFixed(1)}m`;
                 }
@@ -237,7 +237,7 @@
                         <strong>GPS required</strong><br>
                         • No fake GPS apps<br>
                         • No network/wifi locations<br>
-                        • Accuracy ≤ 30 meters<br>
+                        • Accuracy ≤ 200 meters<br>
                         <span style="color:#b71c1c; font-size:0.85rem;">Violations are logged to sheet</span>
                     </div>
                     <button id="enableGpsBtn" class="btn" style="background:#1e4a6b; color:white; padding:12px 20px; border-radius:40px;">Activate GPS</button>
