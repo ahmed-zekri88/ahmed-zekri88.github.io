@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apps Script Test</title>
+</head>
+<body>
+    <h2>Test Apps Script</h2>
+    <button onclick="test()">Send Request</button>
+    <pre id="output"></pre>
+
+    <script>
+        const URL = 'https://script.google.com/macros/s/AKfycbyybWudt6vE_j8A9B4lnRwDaWSwuDfhdS5I8pdVb_kWLKShpUDGYhMOS23cgsq2_x6sPw/exec'; // <-- paste your /exec URL here
+
+        async function test() {
+            const output = document.getElementById('output');
+            output.textContent = 'Sending...';
+
+            const formData = new URLSearchParams();
+            formData.append('action', 'signup');
+            formData.append('username', 'testuser');
+            formData.append('password', '1234');
+
+            try {
+                const response = await fetch(URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                const text = await response.text();
+                output.textContent = 'Response:\n' + text;
+            } catch (e) {
+                output.textContent = 'Error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
