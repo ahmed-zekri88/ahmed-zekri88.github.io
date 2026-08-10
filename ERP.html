@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ERP · Login</title>
     <style>
-        /* ... (same styles as before) ... */
-        /* I'll keep the same styles to save space, but you can reuse your existing CSS */
+        /* ----- RESET & BASE ----- */
         *,
         *::before,
         *::after {
@@ -14,6 +13,7 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f0f4f9;
@@ -23,6 +23,7 @@
             justify-content: center;
             padding: 1.5rem;
         }
+
         .erp-card {
             background: #ffffff;
             border-radius: 2rem;
@@ -32,15 +33,18 @@
             padding: 2.5rem 2rem 2.8rem;
             transition: transform 0.2s ease;
         }
+
         .erp-card:hover {
             transform: translateY(-2px);
         }
+
         .erp-header {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 0.5rem;
         }
+
         .erp-header .logo-icon {
             width: 44px;
             height: 44px;
@@ -54,15 +58,18 @@
             color: #fff;
             flex-shrink: 0;
         }
+
         .erp-header h1 {
             font-size: 1.8rem;
             font-weight: 700;
             letter-spacing: -0.02em;
             color: #0b1a33;
         }
+
         .erp-header h1 span {
             color: #2563eb;
         }
+
         .erp-subhead {
             font-size: 0.95rem;
             color: #64748b;
@@ -70,9 +77,11 @@
             border-left: 4px solid #2563eb;
             padding-left: 0.75rem;
         }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
+
         .form-group label {
             display: block;
             font-size: 0.85rem;
@@ -81,9 +90,11 @@
             margin-bottom: 0.4rem;
             letter-spacing: 0.01em;
         }
+
         .form-group .input-wrap {
             position: relative;
         }
+
         .form-group .input-wrap input {
             width: 100%;
             padding: 0.85rem 1rem;
@@ -96,14 +107,17 @@
             outline: none;
             color: #0b1a33;
         }
+
         .form-group .input-wrap input:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
             background: #ffffff;
         }
+
         .form-group .input-wrap input::placeholder {
             color: #94a3b8;
         }
+
         .toggle-pw {
             position: absolute;
             right: 14px;
@@ -118,9 +132,11 @@
             line-height: 1;
             transition: color 0.2s;
         }
+
         .toggle-pw:hover {
             color: #2563eb;
         }
+
         .form-options {
             display: flex;
             justify-content: flex-end;
@@ -128,16 +144,19 @@
             margin: 0.25rem 0 1.75rem;
             font-size: 0.85rem;
         }
+
         .form-options .forgot {
             color: #2563eb;
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
         }
+
         .form-options .forgot:hover {
             color: #1e40af;
             text-decoration: underline;
         }
+
         .btn-primary {
             width: 100%;
             padding: 0.9rem;
@@ -152,25 +171,30 @@
             letter-spacing: 0.01em;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
             background: linear-gradient(135deg, #1d4ed8, #1e40af);
         }
+
         .btn-primary:active {
             transform: translateY(0);
         }
+
         .btn-primary:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none !important;
         }
+
         .auth-toggle {
             text-align: center;
             margin-top: 1.8rem;
             font-size: 0.95rem;
             color: #475569;
         }
+
         .auth-toggle a {
             color: #2563eb;
             font-weight: 600;
@@ -179,10 +203,12 @@
             transition: color 0.2s;
             border-bottom: 1.5px dotted transparent;
         }
+
         .auth-toggle a:hover {
             color: #1e40af;
             border-bottom-color: #1e40af;
         }
+
         .message {
             padding: 0.75rem 1rem;
             border-radius: 10px;
@@ -192,22 +218,27 @@
             align-items: center;
             gap: 0.5rem;
             animation: fadeSlide 0.3s ease;
+            word-break: break-word;
         }
+
         .message.error {
             display: flex;
             background: #fef2f2;
             color: #b91c1c;
             border: 1px solid #fecaca;
         }
+
         .message.success {
             display: flex;
             background: #ecfdf5;
             color: #065f46;
             border: 1px solid #a7f3d0;
         }
+
         .message .msg-icon {
             font-size: 1.2rem;
         }
+
         @keyframes fadeSlide {
             from {
                 opacity: 0;
@@ -218,12 +249,16 @@
                 transform: translateY(0);
             }
         }
+
         .signup-extra {
             display: none;
         }
+
         .signup-extra.active {
             display: block;
         }
+
+        /* ----- RESPONSIVE ----- */
         @media (max-width: 600px) {
             .erp-card {
                 padding: 1.8rem 1.2rem 2rem;
@@ -244,6 +279,7 @@
                 padding: 0.8rem;
             }
         }
+
         @media (max-width: 400px) {
             .erp-card {
                 padding: 1.5rem 0.9rem 1.8rem;
@@ -315,10 +351,15 @@
         (function() {
             'use strict';
 
-            // ---------- CONFIG ----------
-            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyybWudt6vE_j8A9B4lnRwDaWSwuDfhdS5I8pdVb_kWLKShpUDGYhMOS23cgsq2_x6sPw/exec'; // <-- PASTE YOUR URL HERE
+            // ------------------------------------------------------------
+            // 1.  CONFIGURATION
+            //     Paste your Google Apps Script Web App URL below.
+            // ------------------------------------------------------------
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyybWudt6vE_j8A9B4lnRwDaWSwuDfhdS5I8pdVb_kWLKShpUDGYhMOS23cgsq2_x6sPw/exec';  // <-- REPLACE THIS
 
-            // ---------- DOM refs ----------
+            // ------------------------------------------------------------
+            // 2.  DOM REFERENCES
+            // ------------------------------------------------------------
             const form = document.getElementById('authForm');
             const username = document.getElementById('username');
             const password = document.getElementById('password');
@@ -334,10 +375,14 @@
             const togglePwBtn = document.getElementById('togglePw');
             const forgotLink = document.getElementById('forgotLink');
 
-            // ---------- State ----------
-            let isLoginMode = true;
+            // ------------------------------------------------------------
+            // 3.  STATE
+            // ------------------------------------------------------------
+            let isLoginMode = true;   // true = login, false = signup
 
-            // ---------- Helpers ----------
+            // ------------------------------------------------------------
+            // 4.  HELPERS
+            // ------------------------------------------------------------
             function showMessage(text, type) {
                 messageBox.className = 'message ' + type;
                 msgText.innerHTML = text;
@@ -345,7 +390,7 @@
                 clearTimeout(window._msgTimer);
                 window._msgTimer = setTimeout(() => {
                     messageBox.className = 'message';
-                }, 8000); // longer to read debug info
+                }, 8000);
             }
 
             function hideMessage() {
@@ -376,7 +421,9 @@
                 confirmPw.value = '';
             }
 
-            // ---------- Toggle password visibility ----------
+            // ------------------------------------------------------------
+            // 5.  PASSWORD VISIBILITY TOGGLE
+            // ------------------------------------------------------------
             let pwVisible = false;
             togglePwBtn.addEventListener('click', function() {
                 pwVisible = !pwVisible;
@@ -388,20 +435,26 @@
                 togglePwBtn.textContent = pwVisible ? '🙈' : '👁️';
             });
 
-            // ---------- Toggle login/signup ----------
+            // ------------------------------------------------------------
+            // 6.  TOGGLE LOGIN / SIGNUP
+            // ------------------------------------------------------------
             toggleLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 setMode(!isLoginMode);
             });
 
-            // ---------- Forgot password (demo) ----------
+            // ------------------------------------------------------------
+            // 7.  FORGOT PASSWORD (demo)
+            // ------------------------------------------------------------
             forgotLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 showMessage('📧 A password reset link would be sent to your email.', 'success');
             });
 
-            // ---------- Form submission ----------
-            form.addEventListener('submit', function(e) {
+            // ------------------------------------------------------------
+            // 8.  FORM SUBMISSION
+            // ------------------------------------------------------------
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 hideMessage();
 
@@ -409,7 +462,7 @@
                 const pass = password.value.trim();
                 const confirm = confirmPw.value.trim();
 
-                // ---- Client-side validation ----
+                // ----- Client‑side validation -----
                 if (!user) {
                     showMessage('Please enter your username.', 'error');
                     username.focus();
@@ -444,7 +497,7 @@
                     }
                 }
 
-                // ---- Send as form-urlencoded ----
+                // ----- Send as application/x-www-form-urlencoded -----
                 const action = isLoginMode ? 'login' : 'signup';
                 const formData = new URLSearchParams();
                 formData.append('action', action);
@@ -454,66 +507,82 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
 
-                fetch(APPS_SCRIPT_URL, {
+                try {
+                    const response = await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'cors',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
                         body: formData
-                    })
-                    .then(async response => {
-                        // Log response details
-                        console.log('Response status:', response.status);
-                        console.log('Response headers:', [...response.headers.entries()]);
+                    });
 
-                        // Get the raw text first
-                        const text = await response.text();
-                        console.log('Raw response text:', text);
+                    // Get raw response text
+                    const rawText = await response.text();
+                    console.log('Raw response:', rawText);
 
-                        // Try to parse as JSON
-                        try {
-                            return JSON.parse(text);
-                        } catch (e) {
-                            // If parsing fails, show the raw text in the UI
-                            throw new Error(`Server returned non-JSON: ${text.substring(0, 200)}`);
-                        }
-                    })
-                    .then(data => {
+                    // Try to parse as JSON
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (parseError) {
+                        // Show the raw text if it's not JSON
+                        showMessage(
+                            `❌ Server returned non‑JSON: <pre style="white-space:pre-wrap;margin:0;font-size:0.85rem;">${escapeHtml(rawText)}</pre>`,
+                            'error'
+                        );
                         submitBtn.disabled = false;
                         submitBtn.textContent = isLoginMode ? 'Sign In' : 'Create Account';
+                        return;
+                    }
 
-                        if (data && typeof data === 'object' && 'success' in data && 'message' in data) {
-                            if (data.success) {
-                                if (isLoginMode) {
-                                    showMessage(`✅ ${data.message} Welcome back, ${user}!`, 'success');
-                                } else {
-                                    showMessage(`🎉 ${data.message}`, 'success');
-                                    setTimeout(() => {
-                                        setMode(true);
-                                        username.value = user;
-                                        showMessage(`✅ Account created! Please sign in, ${user}.`, 'success');
-                                    }, 2000);
-                                }
+                    // Validate expected structure
+                    if (data && typeof data === 'object' && 'success' in data && 'message' in data) {
+                        if (data.success) {
+                            if (isLoginMode) {
+                                showMessage(`✅ ${data.message} Welcome back, ${user}!`, 'success');
                             } else {
-                                showMessage(`❌ ${data.message}`, 'error');
+                                showMessage(`🎉 ${data.message}`, 'success');
+                                setTimeout(() => {
+                                    setMode(true);
+                                    username.value = user;
+                                    showMessage(`✅ Account created! Please sign in, ${user}.`, 'success');
+                                }, 2000);
                             }
                         } else {
-                            // Unexpected JSON structure
-                            console.error('Unexpected response structure:', data);
-                            showMessage(`❌ Unexpected server response. Check console for details.`, 'error');
+                            showMessage(`❌ ${data.message}`, 'error');
                         }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = isLoginMode ? 'Sign In' : 'Create Account';
-                        // Show the error message (which might contain the raw response)
-                        showMessage(`❌ ${error.message || 'Network error. Please try again.'}`, 'error');
-                    });
+                    } else {
+                        console.error('Unexpected structure:', data);
+                        showMessage(
+                            `❌ Unexpected server response structure. Raw: ${escapeHtml(JSON.stringify(data))}`,
+                            'error'
+                        );
+                    }
+
+                } catch (fetchError) {
+                    console.error('Fetch error:', fetchError);
+                    showMessage(`❌ Network error: ${fetchError.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = isLoginMode ? 'Sign In' : 'Create Account';
+                }
             });
 
-            // ---------- Init ----------
+            // Helper to escape HTML for safe display in messages
+            function escapeHtml(unsafe) {
+                return unsafe.replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    return m;
+                });
+            }
+
+            // ------------------------------------------------------------
+            // 9.  INIT – start in login mode
+            // ------------------------------------------------------------
             setMode(true);
 
         })();
