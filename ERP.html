@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ERP · Login</title>
+    <style>
+        /* ... (same styles as before) ... */
+        /* I'll keep the same styles to save space, but you can reuse your existing CSS */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .erp-card {
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem 2rem 2.8rem;
+            transition: transform 0.2s ease;
+        }
+        .erp-card:hover {
+            transform: translateY(-2px);
+        }
+        .erp-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .erp-header .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .erp-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #0b1a33;
+        }
+        .erp-header h1 span {
+            color: #2563eb;
+        }
+        .erp-subhead {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+            border-left: 4px solid #2563eb;
+            padding-left: 0.75rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.01em;
+        }
+        .form-group .input-wrap {
+            position: relative;
+        }
+        .form-group .input-wrap input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: #f8fafc;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            color: #0b1a33;
+        }
+        .form-group .input-wrap input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+            background: #ffffff;
+        }
+        .form-group .input-wrap input::placeholder {
+            color: #94a3b8;
+        }
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            padding: 4px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .toggle-pw:hover {
+            color: #2563eb;
+        }
+        .form-options {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 0.25rem 0 1.75rem;
+            font-size: 0.85rem;
+        }
+        .form-options .forgot {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .form-options .forgot:hover {
+            color: #1e40af;
+            text-decoration: underline;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.01em;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.95rem;
+            color: #475569;
+        }
+        .auth-toggle a {
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s;
+            border-bottom: 1.5px dotted transparent;
+        }
+        .auth-toggle a:hover {
+            color: #1e40af;
+            border-bottom-color: #1e40af;
+        }
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-top: 1.25rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            animation: fadeSlide 0.3s ease;
+        }
+        .message.error {
+            display: flex;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        .message.success {
+            display: flex;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .message .msg-icon {
+            font-size: 1.2rem;
+        }
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .signup-extra {
+            display: none;
+        }
+        .signup-extra.active {
+            display: block;
+        }
+        @media (max-width: 600px) {
+            .erp-card {
+                padding: 1.8rem 1.2rem 2rem;
+                border-radius: 1.5rem;
+            }
+            .erp-header h1 {
+                font-size: 1.5rem;
+            }
+            .erp-header .logo-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+            .form-options {
+                justify-content: center;
+            }
+            .btn-primary {
+                padding: 0.8rem;
+            }
+        }
+        @media (max-width: 400px) {
+            .erp-card {
+                padding: 1.5rem 0.9rem 1.8rem;
+            }
+            .erp-header h1 {
+                font-size: 1.3rem;
+            }
+            .form-group .input-wrap input {
+                padding: 0.7rem 0.9rem;
+                font-size: 0.9rem;
+            }
+            .btn-primary {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="erp-card" role="main" aria-label="ERP login and signup">
+        <div class="erp-header">
+            <div class="logo-icon">ERP</div>
+            <h1><span>E</span>RP</h1>
+        </div>
+        <div class="erp-subhead" id="modeSubhead">Sign in to your account</div>
+
+        <form id="authForm" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
+                    <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password visibility">👁️</button>
+                </div>
+            </div>
+
+            <div class="form-group signup-extra" id="confirmGroup">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" />
+                </div>
+            </div>
+
+            <div class="form-options">
+                <a href="#" class="forgot" id="forgotLink">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">Sign In</button>
+
+            <div class="auth-toggle">
+                <span id="toggleText">Don't have an account?</span>
+                <a id="toggleLink">Sign Up</a>
+            </div>
+
+            <div class="message" id="messageBox">
+                <span class="msg-icon" id="msgIcon">⚠️</span>
+                <span id="msgText">Message</span>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- CONFIG ----------
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyybWudt6vE_j8A9B4lnRwDaWSwuDfhdS5I8pdVb_kWLKShpUDGYhMOS23cgsq2_x6sPw/exec'; // <-- PASTE YOUR URL HERE
+
+            // ---------- DOM refs ----------
+            const form = document.getElementById('authForm');
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+            const confirmPw = document.getElementById('confirmPassword');
+            const confirmGroup = document.getElementById('confirmGroup');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleLink = document.getElementById('toggleLink');
+            const toggleText = document.getElementById('toggleText');
+            const modeSubhead = document.getElementById('modeSubhead');
+            const messageBox = document.getElementById('messageBox');
+            const msgText = document.getElementById('msgText');
+            const msgIcon = document.getElementById('msgIcon');
+            const togglePwBtn = document.getElementById('togglePw');
+            const forgotLink = document.getElementById('forgotLink');
+
+            // ---------- State ----------
+            let isLoginMode = true;
+
+            // ---------- Helpers ----------
+            function showMessage(text, type) {
+                messageBox.className = 'message ' + type;
+                msgText.innerHTML = text;
+                msgIcon.textContent = type === 'error' ? '⚠️' : '✅';
+                clearTimeout(window._msgTimer);
+                window._msgTimer = setTimeout(() => {
+                    messageBox.className = 'message';
+                }, 8000); // longer to read debug info
+            }
+
+            function hideMessage() {
+                messageBox.className = 'message';
+                clearTimeout(window._msgTimer);
+            }
+
+            function setMode(login) {
+                isLoginMode = login;
+                const isLogin = isLoginMode;
+
+                confirmGroup.classList.toggle('active', !isLogin);
+                confirmPw.required = !isLogin;
+
+                submitBtn.textContent = isLogin ? 'Sign In' : 'Create Account';
+                modeSubhead.textContent = isLogin ?
+                    'Sign in to your account' :
+                    'Create your ERP account';
+                toggleText.textContent = isLogin ?
+                    "Don't have an account?" :
+                    'Already have an account?';
+                toggleLink.textContent = isLogin ? 'Sign Up' : 'Sign In';
+                forgotLink.style.display = isLogin ? 'inline' : 'none';
+
+                hideMessage();
+                username.value = '';
+                password.value = '';
+                confirmPw.value = '';
+            }
+
+            // ---------- Toggle password visibility ----------
+            let pwVisible = false;
+            togglePwBtn.addEventListener('click', function() {
+                pwVisible = !pwVisible;
+                const type = pwVisible ? 'text' : 'password';
+                password.type = type;
+                if (confirmGroup.classList.contains('active')) {
+                    confirmPw.type = type;
+                }
+                togglePwBtn.textContent = pwVisible ? '🙈' : '👁️';
+            });
+
+            // ---------- Toggle login/signup ----------
+            toggleLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                setMode(!isLoginMode);
+            });
+
+            // ---------- Forgot password (demo) ----------
+            forgotLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                showMessage('📧 A password reset link would be sent to your email.', 'success');
+            });
+
+            // ---------- Form submission ----------
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                hideMessage();
+
+                const user = username.value.trim();
+                const pass = password.value.trim();
+                const confirm = confirmPw.value.trim();
+
+                // ---- Client-side validation ----
+                if (!user) {
+                    showMessage('Please enter your username.', 'error');
+                    username.focus();
+                    return;
+                }
+                if (user.length < 3) {
+                    showMessage('Username must be at least 3 characters.', 'error');
+                    username.focus();
+                    return;
+                }
+                if (!pass) {
+                    showMessage('Please enter your password.', 'error');
+                    password.focus();
+                    return;
+                }
+                if (pass.length < 4) {
+                    showMessage('Password must be at least 4 characters.', 'error');
+                    password.focus();
+                    return;
+                }
+
+                if (!isLoginMode) {
+                    if (!confirm) {
+                        showMessage('Please confirm your password.', 'error');
+                        confirmPw.focus();
+                        return;
+                    }
+                    if (pass !== confirm) {
+                        showMessage('Passwords do not match.', 'error');
+                        confirmPw.focus();
+                        return;
+                    }
+                }
+
+                // ---- Send as form-urlencoded ----
+                const action = isLoginMode ? 'login' : 'signup';
+                const formData = new URLSearchParams();
+                formData.append('action', action);
+                formData.append('username', user);
+                formData.append('password', pass);
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+
+                fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: formData
+                    })
+                    .then(async response => {
+                        // Log response details
+                        console.log('Response status:', response.status);
+                        console.log('Response headers:', [...response.headers.entries()]);
+
+                        // Get the raw text first
+                        const text = await response.text();
+                        console.log('Raw response text:', text);
+
+                        // Try to parse as JSON
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            // If parsing fails, show the raw text in the UI
+                            throw new Error(`Server returned non-JSON: ${text.substring(0, 200)}`);
+                        }
+                    })
+                    .then(data => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = isLoginMode ? 'Sign In' : 'Create Account';
+
+                        if (data && typeof data === 'object' && 'success' in data && 'message' in data) {
+                            if (data.success) {
+                                if (isLoginMode) {
+                                    showMessage(`✅ ${data.message} Welcome back, ${user}!`, 'success');
+                                } else {
+                                    showMessage(`🎉 ${data.message}`, 'success');
+                                    setTimeout(() => {
+                                        setMode(true);
+                                        username.value = user;
+                                        showMessage(`✅ Account created! Please sign in, ${user}.`, 'success');
+                                    }, 2000);
+                                }
+                            } else {
+                                showMessage(`❌ ${data.message}`, 'error');
+                            }
+                        } else {
+                            // Unexpected JSON structure
+                            console.error('Unexpected response structure:', data);
+                            showMessage(`❌ Unexpected server response. Check console for details.`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = isLoginMode ? 'Sign In' : 'Create Account';
+                        // Show the error message (which might contain the raw response)
+                        showMessage(`❌ ${error.message || 'Network error. Please try again.'}`, 'error');
+                    });
+            });
+
+            // ---------- Init ----------
+            setMode(true);
+
+        })();
+    </script>
+</body>
+</html>
