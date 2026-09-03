@@ -1,38 +1,1807 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Apps Script Test</title>
-</head>
-<body>
-    <h2>Test Apps Script</h2>
-    <button onclick="test()">Send Request</button>
-    <pre id="output"></pre>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrackFlow · GPS Tracker</title>
 
-    <script>
-        const URL = 'https://script.google.com/macros/s/AKfycbyybWudt6vE_j8A9B4lnRwDaWSwuDfhdS5I8pdVb_kWLKShpUDGYhMOS23cgsq2_x6sPw/exec'; // <-- paste your /exec URL here
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
 
-        async function test() {
-            const output = document.getElementById('output');
-            output.textContent = 'Sending...';
+    <!-- Google Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-            const formData = new URLSearchParams();
-            formData.append('action', 'signup');
-            formData.append('username', 'testuser');
-            formData.append('password', '1234');
+    <style>
+        /* ----- RESET & BASE ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f7fb;
+            color: #1a2639;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
 
-            try {
-                const response = await fetch(URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                });
-                const text = await response.text();
-                output.textContent = 'Response:\n' + text;
-            } catch (e) {
-                output.textContent = 'Error: ' + e.message;
+        .app {
+            max-width: 1400px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            padding: 28px 32px 36px;
+            transition: all 0.2s;
+        }
+
+        /* ----- HEADER ----- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .app-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .app-header h1 i {
+            color: #2a7de1;
+            font-size: 28px;
+        }
+        .app-header .badge {
+            background: #eef3fa;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3a4a6b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .app-header .badge i {
+            color: #2a7de1;
+        }
+
+        /* ----- TABS ----- */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            background: #f0f4fa;
+            padding: 5px;
+            border-radius: 16px;
+            margin-bottom: 28px;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #4a5a7a;
+            cursor: pointer;
+            transition: 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: inherit;
+        }
+        .tab-btn i {
+            font-size: 16px;
+        }
+        .tab-btn:hover {
+            background: rgba(42, 125, 225, 0.07);
+            color: #1a2639;
+        }
+        .tab-btn.active {
+            background: #ffffff;
+            color: #1a2639;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+        .tab-btn.active i {
+            color: #2a7de1;
+        }
+
+        /* ----- PANELS ----- */
+        .panel {
+            display: none;
+            animation: fadeUp 0.35s ease;
+        }
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
+
+        /* ----- DATA COLLECTOR ----- */
+        .collector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+        @media (max-width: 900px) {
+            .collector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #f9fbfd;
+            border-radius: 20px;
+            padding: 24px 26px;
+            border: 1px solid #e8edf4;
+            transition: 0.2s;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a2639;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title i {
+            color: #2a7de1;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Registration Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3a4a6b;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1.5px solid #dce3ec;
+            font-size: 15px;
+            font-family: inherit;
+            background: #ffffff;
+            transition: 0.2s;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: #2a7de1;
+            box-shadow: 0 0 0 4px rgba(42, 125, 225, 0.12);
+        }
+        .form-group input::placeholder {
+            color: #aab3c9;
+        }
+
+        .btn-primary {
+            background: #2a7de1;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary:hover {
+            background: #1a6ac9;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(42, 125, 225, 0.25);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-danger {
+            background: #e44a4a;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-danger:hover {
+            background: #cc3a3a;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(228, 74, 74, 0.25);
+        }
+        .btn-danger:active {
+            transform: scale(0.97);
+        }
+        .btn-success {
+            background: #2d9e5f;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-success:hover {
+            background: #238a50;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(45, 158, 95, 0.25);
+        }
+        .btn-success:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #3a4a6b;
+            border: 1.5px solid #dce3ec;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-outline:hover {
+            background: #f0f4fa;
+            border-color: #bcc7db;
+        }
+        .btn-outline:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-gps {
+            background: #1a2639;
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-gps:hover {
+            background: #2a3a5a;
+            transform: translateY(-1px);
+        }
+        .btn-gps:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-gps.granted {
+            background: #2d9e5f;
+        }
+        .btn-gps.denied {
+            background: #e44a4a;
+        }
+
+        .status-box {
+            background: #eef3fa;
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .status-box .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5a7a;
+        }
+        .status-box .value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a2639;
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #fff;
+            padding: 2px 14px;
+            border-radius: 20px;
+            border: 1px solid #dce3ec;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.recording {
+            background: #e44a4a;
+            animation: pulse 1.2s infinite;
+        }
+        .status-dot.idle {
+            background: #8a9bb5;
+        }
+        .status-dot.gps-ok {
+            background: #2d9e5f;
+        }
+        .status-dot.gps-wait {
+            background: #e9a23b;
+            animation: pulse 1.8s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.85);
+            }
+        }
+
+        .log-area {
+            margin-top: 16px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e8edf4;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #2a3a5a;
+        }
+        .log-area .entry {
+            padding: 4px 0;
+            border-bottom: 1px solid #f0f4fa;
+            display: flex;
+            justify-content: space-between;
+        }
+        .log-area .entry:last-child {
+            border-bottom: none;
+        }
+        .log-area .entry .time {
+            color: #6a7a9a;
+        }
+        .log-area .entry .coord {
+            color: #1a2639;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: #8a9bb5;
+        }
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.4;
+        }
+        .empty-state p {
+            font-size: 15px;
+        }
+
+        /* ----- DATA VIEWER ----- */
+        .viewer-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: #f9fbfd;
+            padding: 16px 22px;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+        }
+        .viewer-controls label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #3a4a6b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .viewer-controls input[type="date"] {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1.5px solid #dce3ec;
+            font-size: 14px;
+            font-family: inherit;
+            background: #ffffff;
+            outline: none;
+            transition: 0.2s;
+        }
+        .viewer-controls input[type="date"]:focus {
+            border-color: #2a7de1;
+            box-shadow: 0 0 0 4px rgba(42, 125, 225, 0.1);
+        }
+        .viewer-controls .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 180px;
+        }
+        .viewer-controls .filter-group input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1.5px solid #dce3ec;
+            font-size: 14px;
+            font-family: inherit;
+            background: #ffffff;
+            outline: none;
+            transition: 0.2s;
+            min-width: 120px;
+        }
+        .viewer-controls .filter-group input:focus {
+            border-color: #2a7de1;
+            box-shadow: 0 0 0 4px rgba(42, 125, 225, 0.1);
+        }
+        .viewer-controls .filter-group .clear-filter {
+            background: transparent;
+            border: none;
+            color: #8a9bb5;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 6px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .viewer-controls .filter-group .clear-filter:hover {
+            background: #eef3fa;
+            color: #1a2639;
+        }
+
+        .viewer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+        }
+        @media (max-width: 1000px) {
+            .viewer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            background: #f9fbfd;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+            padding: 4px 0;
+        }
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 420px;
+        }
+        .table-wrap th {
+            text-align: left;
+            padding: 14px 18px;
+            background: #f0f4fa;
+            font-weight: 600;
+            color: #2a3a5a;
+            border-bottom: 2px solid #dce3ec;
+            white-space: nowrap;
+        }
+        .table-wrap td {
+            padding: 12px 18px;
+            border-bottom: 1px solid #e8edf4;
+            vertical-align: middle;
+        }
+        .table-wrap tr:last-child td {
+            border-bottom: none;
+        }
+        .table-wrap .name-cell {
+            font-weight: 600;
+            color: #1a2639;
+            white-space: nowrap;
+        }
+        .table-wrap .loc-cell {
+            font-size: 13px;
+            color: #3a4a6b;
+        }
+        .table-wrap .loc-cell .time-tag {
+            background: #eef3fa;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #4a5a7a;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        .table-wrap .loc-cell .coord-badge {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            background: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid #e8edf4;
+            display: inline-block;
+        }
+        .table-wrap .count-badge {
+            background: #eef3fa;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a5a7a;
+            display: inline-block;
+        }
+        .table-wrap .empty-row td {
+            text-align: center;
+            color: #8a9bb5;
+            padding: 30px 18px;
+            font-style: italic;
+        }
+
+        .map-container {
+            background: #f9fbfd;
+            border-radius: 16px;
+            border: 1px solid #e8edf4;
+            overflow: hidden;
+            height: 480px;
+            position: relative;
+        }
+        .map-container #map {
+            width: 100%;
+            height: 100%;
+        }
+        .map-container .map-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #8a9bb5;
+            padding: 20px;
+            text-align: center;
+        }
+        .map-container .map-placeholder i {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 12px;
+        }
+
+        .no-data-msg {
+            padding: 30px 20px;
+            text-align: center;
+            color: #8a9bb5;
+        }
+        .no-data-msg i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+            opacity: 0.4;
+        }
+
+        /* ----- TOAST / NOTIFICATION ----- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a2639;
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast i {
+            font-size: 18px;
+        }
+        .toast.success i {
+            color: #4ade80;
+        }
+        .toast.error i {
+            color: #f87171;
+        }
+        .toast.info i {
+            color: #60a5fa;
+        }
+
+        /* ----- GPS PERMISSION OVERLAY ----- */
+        .gps-permission-banner {
+            background: #f0f7ff;
+            border: 1.5px solid #b8d4f0;
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .gps-permission-banner .gps-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a2639;
+        }
+        .gps-permission-banner .gps-status i {
+            font-size: 20px;
+        }
+        .gps-permission-banner .gps-status .status-text {
+            font-weight: 400;
+            color: #4a5a7a;
+        }
+
+        /* ----- RESPONSIVE TWEAKS ----- */
+        @media (max-width: 600px) {
+            .app {
+                padding: 16px;
+                border-radius: 20px;
+            }
+            .app-header h1 {
+                font-size: 20px;
+            }
+            .tab-btn {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+            .tab-btn span {
+                display: none;
+            }
+            .tab-btn i {
+                font-size: 18px;
+            }
+            .card {
+                padding: 18px;
+            }
+            .viewer-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .viewer-controls .filter-group {
+                flex-wrap: wrap;
+            }
+            .btn-primary,
+            .btn-danger,
+            .btn-success,
+            .btn-gps {
+                width: 100%;
+                justify-content: center;
+            }
+            .status-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .gps-permission-banner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* scrollbar */
+        .log-area::-webkit-scrollbar,
+        .table-wrap::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .log-area::-webkit-scrollbar-track,
+        .table-wrap::-webkit-scrollbar-track {
+            background: #f0f4fa;
+        }
+        .log-area::-webkit-scrollbar-thumb,
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: #c8d2e3;
+            border-radius: 10px;
+        }
+
+        /* leaflet tooltip override */
+        .custom-tooltip {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(26, 38, 57, 0.85);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 4px 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+        .custom-tooltip::before {
+            border-top-color: rgba(26, 38, 57, 0.85);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app" id="app">
+
+        <!-- HEADER -->
+        <div class="app-header">
+            <h1><i class="fas fa-satellite-dish"></i> TrackFlow</h1>
+            <div class="badge">
+                <i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i>
+                <span id="headerStatus">Ready</span>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs" role="tablist">
+            <button class="tab-btn active" data-tab="collector">
+                <i class="fas fa-fingerprint"></i> <span>Data Collector</span>
+            </button>
+            <button class="tab-btn" data-tab="viewer">
+                <i class="fas fa-chart-simple"></i> <span>Data Viewer</span>
+            </button>
+        </div>
+
+        <!-- ==================== DATA COLLECTOR ==================== -->
+        <div class="panel active" id="panel-collector">
+
+            <!-- GPS PERMISSION BANNER -->
+            <div class="gps-permission-banner" id="gpsBanner">
+                <div class="gps-status">
+                    <i class="fas fa-satellite" id="gpsIcon" style="color:#8a9bb5;"></i>
+                    <span id="gpsStatusText">GPS permission required</span>
+                    <span class="status-text" id="gpsStatusDetail">—</span>
+                </div>
+                <button class="btn-gps" id="gpsRequestBtn">
+                    <i class="fas fa-location-dot"></i> Request GPS Access
+                </button>
+            </div>
+
+            <div class="collector-grid">
+
+                <!-- LEFT: Registration / Status -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-id-card"></i> Device Registration</div>
+
+                    <!-- Scenario 1: No TID -->
+                    <div id="scenario-register">
+                        <p style="color:#4a5a7a;font-size:14px;margin-bottom:16px;">
+                            No TID found on this device. Please register with your National ID.
+                        </p>
+                        <div class="form-group">
+                            <label for="nationalIdInput">National ID</label>
+                            <input type="text" id="nationalIdInput" placeholder="e.g. 1234567890" />
+                        </div>
+                        <div class="form-group">
+                            <label for="nameInput">Full Name</label>
+                            <input type="text" id="nameInput" placeholder="e.g. Ahmed Hassan" />
+                        </div>
+                        <button class="btn-primary" id="registerBtn">
+                            <i class="fas fa-key"></i> Register Device
+                        </button>
+                        <div id="registerFeedback" style="margin-top:14px;font-size:14px;"></div>
+                    </div>
+
+                    <!-- Scenario 2: TID exists -->
+                    <div id="scenario-track" style="display:none;">
+                        <div class="status-box">
+                            <span class="label"><i class="fas fa-barcode"></i> TID</span>
+                            <span class="value" id="displayTid">—</span>
+                            <span style="flex:1;"></span>
+                            <button class="btn-outline" id="resetTidBtn" style="font-size:12px;padding:6px 14px;">
+                                <i class="fas fa-rotate-right"></i> Reset
+                            </button>
+                        </div>
+
+                        <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                            <button class="btn-success" id="startBtn" disabled>
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                            <button class="btn-danger" id="stopBtn" disabled>
+                                <i class="fas fa-stop"></i> Stop
+                            </button>
+                            <span style="font-size:13px;color:#4a5a7a;margin-left:8px;" id="recordingStatus">
+                                <span class="status-dot idle" id="statusDot"></span> Idle
+                            </span>
+                        </div>
+
+                        <div style="margin-top:12px;font-size:13px;color:#4a5a7a;">
+                            <i class="fas fa-info-circle"></i> Press <strong>Start</strong> to begin tracking your location every 5 seconds.
+                            <span id="gpsHint" style="display:block;margin-top:4px;font-size:12px;color:#8a9bb5;">
+                                <i class="fas fa-triangle-exclamation"></i> GPS access must be granted first.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Log -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-list-ul"></i> Live Log</div>
+                    <div id="logContainer">
+                        <div class="empty-state">
+                            <i class="fas fa-map-pin"></i>
+                            <p>No data collected yet.<br />Register and start tracking.</p>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                        <button class="btn-outline" id="clearLogBtn" style="font-size:12px;padding:6px 16px;">
+                            <i class="fas fa-trash-can"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== DATA VIEWER ==================== -->
+        <div class="panel" id="panel-viewer">
+
+            <div class="viewer-controls">
+                <label>
+                    <i class="fas fa-calendar-day"></i>
+                    <input type="date" id="viewerDate" />
+                </label>
+
+                <div class="filter-group">
+                    <i class="fas fa-filter" style="color:#8a9bb5;"></i>
+                    <input type="text" id="filterNameInput" placeholder="Filter by Name or TID…" />
+                    <button class="clear-filter" id="clearFilterBtn" title="Clear filter">
+                        <i class="fas fa-circle-xmark"></i>
+                    </button>
+                </div>
+
+                <button class="btn-primary" id="refreshViewerBtn" style="padding:10px 22px;font-size:14px;">
+                    <i class="fas fa-rotate"></i> Refresh
+                </button>
+
+                <span style="font-size:13px;color:#4a5a7a;margin-left:auto;" id="viewerStats"></span>
+            </div>
+
+            <div class="viewer-grid">
+                <!-- Table -->
+                <div class="table-wrap" id="viewerTableWrap">
+                    <div class="no-data-msg" id="viewerEmpty">
+                        <i class="fas fa-table"></i>
+                        <p>No data for the selected date.<br />Collect some locations first.</p>
+                    </div>
+                    <table style="display:none;" id="viewerTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>📍 First Location</th>
+                                <th>📍 Last Location</th>
+                                <th style="text-align:center;">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewerTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Map -->
+                <div class="map-container" id="mapContainer">
+                    <div id="map"></div>
+                    <div class="map-placeholder" id="mapPlaceholder">
+                        <i class="fas fa-map"></i>
+                        <p>Select a date with data to see paths.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== TOAST ==================== -->
+        <div class="toast" id="toast">
+            <i class="fas fa-circle-check" id="toastIcon"></i>
+            <span id="toastMsg">Message</span>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // --------------------------------------------------------------
+            //  CONSTANTS & STATE
+            // --------------------------------------------------------------
+            const LS_TID = 'trackflow_tid';
+            const LS_REG = 'trackflow_registration';
+            const LS_DATA = 'trackflow_data';
+            const LS_NAME_MAP = 'trackflow_nameMap';
+
+            let watchId = null;
+            let isRecording = false;
+            let gpsGranted = false;
+            let mapInstance = null;
+            let mapMarkers = [];
+            let mapPolylines = [];
+            let currentFilter = '';
+
+            // DOM refs
+            const $ = id => document.getElementById(id);
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const panels = {
+                collector: $('panel-collector'),
+                viewer: $('panel-viewer')
+            };
+            const scenarioRegister = $('scenario-register');
+            const scenarioTrack = $('scenario-track');
+            const displayTid = $('displayTid');
+            const registerBtn = $('registerBtn');
+            const nationalIdInput = $('nationalIdInput');
+            const nameInput = $('nameInput');
+            const registerFeedback = $('registerFeedback');
+            const startBtn = $('startBtn');
+            const stopBtn = $('stopBtn');
+            const recordingStatus = $('recordingStatus');
+            const statusDot = $('statusDot');
+            const logContainer = $('logContainer');
+            const clearLogBtn = $('clearLogBtn');
+            const resetTidBtn = $('resetTidBtn');
+            const viewerDate = $('viewerDate');
+            const refreshViewerBtn = $('refreshViewerBtn');
+            const viewerTableWrap = $('viewerTableWrap');
+            const viewerTable = $('viewerTable');
+            const viewerTableBody = $('viewerTableBody');
+            const viewerEmpty = $('viewerEmpty');
+            const viewerStats = $('viewerStats');
+            const mapPlaceholder = $('mapPlaceholder');
+            const toast = $('toast');
+            const toastMsg = $('toastMsg');
+            const toastIcon = $('toastIcon');
+            const headerStatus = $('headerStatus');
+            const gpsRequestBtn = $('gpsRequestBtn');
+            const gpsStatusText = $('gpsStatusText');
+            const gpsStatusDetail = $('gpsStatusDetail');
+            const gpsIcon = $('gpsIcon');
+            const gpsHint = $('gpsHint');
+            const filterNameInput = $('filterNameInput');
+            const clearFilterBtn = $('clearFilterBtn');
+
+            // --------------------------------------------------------------
+            //  HELPERS
+            // --------------------------------------------------------------
+            function generateTID() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = 'TID-';
+                for (let i = 0; i < 8; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return code;
+            }
+
+            function getToday() {
+                return new Date().toISOString().split('T')[0];
+            }
+
+            function formatTime(iso) {
+                const d = new Date(iso);
+                return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+
+            function formatDate(iso) {
+                const d = new Date(iso);
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+
+            function showToast(msg, type = 'info') {
+                toast.className = 'toast ' + type;
+                toastMsg.textContent = msg;
+                const icons = {
+                    success: 'fa-circle-check',
+                    error: 'fa-circle-xmark',
+                    info: 'fa-circle-info'
+                };
+                toastIcon.className = 'fas ' + (icons[type] || icons.info);
+                toast.classList.add('show');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => toast.classList.remove('show'), 3200);
+            }
+
+            function getRegistration() {
+                try {
+                    const raw = localStorage.getItem(LS_REG);
+                    return raw ? JSON.parse(raw) : null;
+                } catch { return null; }
+            }
+
+            function getCollectedData() {
+                try {
+                    const raw = localStorage.getItem(LS_DATA);
+                    return raw ? JSON.parse(raw) : [];
+                } catch { return []; }
+            }
+
+            function saveCollectedData(data) {
+                localStorage.setItem(LS_DATA, JSON.stringify(data));
+            }
+
+            function getNameMap() {
+                try {
+                    const raw = localStorage.getItem(LS_NAME_MAP);
+                    return raw ? JSON.parse(raw) : {};
+                } catch { return {}; }
+            }
+
+            function saveNameMap(map) {
+                localStorage.setItem(LS_NAME_MAP, JSON.stringify(map));
+            }
+
+            function getTid() {
+                return localStorage.getItem(LS_TID) || null;
+            }
+
+            function setTid(tid) {
+                if (tid) localStorage.setItem(LS_TID, tid);
+                else localStorage.removeItem(LS_TID);
+            }
+
+            // --------------------------------------------------------------
+            //  GPS PERMISSION
+            // --------------------------------------------------------------
+            function checkGpsPermission() {
+                if (!navigator.geolocation) {
+                    gpsGranted = false;
+                    updateGpsUI('unsupported');
+                    return;
+                }
+
+                // Try a quick getCurrentPosition to check permission status
+                navigator.permissions.query({ name: 'geolocation' }).then(result => {
+                    if (result.state === 'granted') {
+                        gpsGranted = true;
+                        updateGpsUI('granted');
+                    } else if (result.state === 'prompt') {
+                        gpsGranted = false;
+                        updateGpsUI('prompt');
+                    } else if (result.state === 'denied') {
+                        gpsGranted = false;
+                        updateGpsUI('denied');
+                    }
+                }).catch(() => {
+                    // Fallback: try a quick getCurrentPosition
+                    navigator.geolocation.getCurrentPosition(
+                        () => {
+                            gpsGranted = true;
+                            updateGpsUI('granted');
+                        },
+                        (err) => {
+                            if (err.code === 1) {
+                                gpsGranted = false;
+                                updateGpsUI('denied');
+                            } else {
+                                gpsGranted = false;
+                                updateGpsUI('prompt');
+                            }
+                        }, { timeout: 2000, maximumAge: 60000 }
+                    );
+                });
+            }
+
+            function requestGpsPermission() {
+                if (!navigator.geolocation) {
+                    showToast('Geolocation is not supported by this browser.', 'error');
+                    return;
+                }
+
+                showToast('Requesting GPS access…', 'info');
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        gpsGranted = true;
+                        updateGpsUI('granted');
+                        showToast('✅ GPS access granted!', 'success');
+                        updateStartButton();
+                    },
+                    (err) => {
+                        console.warn('GPS permission error:', err);
+                        if (err.code === 1) {
+                            gpsGranted = false;
+                            updateGpsUI('denied');
+                            showToast('GPS access denied. Please enable in browser settings.', 'error');
+                        } else if (err.code === 2) {
+                            showToast('GPS position unavailable. Try again.', 'error');
+                        } else {
+                            showToast('GPS error: ' + err.message, 'error');
+                        }
+                        updateStartButton();
+                    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            }
+
+            function updateGpsUI(state) {
+                const icon = gpsIcon;
+                const text = gpsStatusText;
+                const detail = gpsStatusDetail;
+                const btn = gpsRequestBtn;
+
+                if (state === 'granted') {
+                    icon.style.color = '#2d9e5f';
+                    icon.className = 'fas fa-satellite';
+                    text.textContent = '✅ GPS Active';
+                    detail.textContent = 'Location access granted';
+                    btn.textContent = '✓ Granted';
+                    btn.className = 'btn-gps granted';
+                    btn.disabled = true;
+                    gpsHint.textContent = '✅ GPS is ready. Press Start to track.';
+                    gpsHint.style.color = '#2d9e5f';
+                } else if (state === 'denied') {
+                    icon.style.color = '#e44a4a';
+                    icon.className = 'fas fa-satellite';
+                    text.textContent = '❌ GPS Denied';
+                    detail.textContent = 'Please enable in browser settings';
+                    btn.textContent = '⚠️ Retry';
+                    btn.className = 'btn-gps denied';
+                    btn.disabled = false;
+                    gpsHint.textContent = '❌ GPS access denied. Please allow location access.';
+                    gpsHint.style.color = '#e44a4a';
+                } else if (state === 'prompt') {
+                    icon.style.color = '#e9a23b';
+                    icon.className = 'fas fa-satellite';
+                    text.textContent = '⏳ GPS Pending';
+                    detail.textContent = 'Click "Request GPS Access"';
+                    btn.textContent = '📡 Request GPS Access';
+                    btn.className = 'btn-gps';
+                    btn.disabled = false;
+                    gpsHint.textContent = '⏳ Click "Request GPS Access" to enable tracking.';
+                    gpsHint.style.color = '#e9a23b';
+                } else if (state === 'unsupported') {
+                    icon.style.color = '#8a9bb5';
+                    icon.className = 'fas fa-satellite';
+                    text.textContent = '⚠️ GPS Unsupported';
+                    detail.textContent = 'Your browser does not support geolocation';
+                    btn.textContent = 'Unavailable';
+                    btn.className = 'btn-gps';
+                    btn.disabled = true;
+                    gpsHint.textContent = '⚠️ Geolocation not supported.';
+                    gpsHint.style.color = '#8a9bb5';
+                }
+                updateStartButton();
+            }
+
+            function updateStartButton() {
+                const tid = getTid();
+                const reg = getRegistration();
+                const hasValidTid = tid && reg && reg.tid === tid;
+                if (hasValidTid && gpsGranted) {
+                    startBtn.disabled = false;
+                } else {
+                    startBtn.disabled = true;
+                }
+                // If recording, keep start disabled
+                if (isRecording) startBtn.disabled = true;
+            }
+
+            // --------------------------------------------------------------
+            //  INITIALIZATION
+            // --------------------------------------------------------------
+            function init() {
+                // Set default date to today
+                viewerDate.value = getToday();
+
+                // Load name mapping with sample data if empty
+                const nameMap = getNameMap();
+                if (Object.keys(nameMap).length === 0) {
+                    const samples = {
+                        '1234567890': 'Ahmed Hassan',
+                        '0987654321': 'Sara Ali',
+                        '1122334455': 'Mohamed Ibrahim',
+                        '5566778899': 'Laila Nour',
+                        '9988776655': 'Omar Khaled'
+                    };
+                    saveNameMap(samples);
+                }
+
+                // Check TID
+                checkTID();
+
+                // Check GPS
+                checkGpsPermission();
+
+                // Render log
+                renderLog();
+
+                // Tab switching
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tab = this.dataset.tab;
+                        tabBtns.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        Object.keys(panels).forEach(key => {
+                            panels[key].classList.toggle('active', key === tab);
+                        });
+                        if (tab === 'viewer') {
+                            renderViewer();
+                        }
+                        if (tab === 'viewer' && mapInstance) {
+                            setTimeout(() => mapInstance.invalidateSize(), 200);
+                        }
+                    });
+                });
+
+                // Event listeners
+                registerBtn.addEventListener('click', handleRegister);
+                startBtn.addEventListener('click', handleStart);
+                stopBtn.addEventListener('click', handleStop);
+                clearLogBtn.addEventListener('click', handleClearLog);
+                resetTidBtn.addEventListener('click', handleResetTid);
+                refreshViewerBtn.addEventListener('click', renderViewer);
+                viewerDate.addEventListener('change', renderViewer);
+                gpsRequestBtn.addEventListener('click', requestGpsPermission);
+                filterNameInput.addEventListener('input', handleFilterChange);
+                clearFilterBtn.addEventListener('click', () => {
+                    filterNameInput.value = '';
+                    handleFilterChange();
+                });
+
+                [nationalIdInput, nameInput].forEach(inp => {
+                    inp.addEventListener('keydown', e => {
+                        if (e.key === 'Enter') handleRegister();
+                    });
+                });
+
+                // Init map
+                initMap();
+
+                updateHeaderStatus();
+            }
+
+            // --------------------------------------------------------------
+            //  TID CHECK
+            // --------------------------------------------------------------
+            function checkTID() {
+                const tid = getTid();
+                const reg = getRegistration();
+                if (tid && reg && reg.tid === tid) {
+                    scenarioRegister.style.display = 'none';
+                    scenarioTrack.style.display = 'block';
+                    displayTid.textContent = tid;
+                    startBtn.disabled = !gpsGranted;
+                    stopBtn.disabled = true;
+                    recordingStatus.innerHTML =
+                        `<span class="status-dot idle" id="statusDot"></span> Idle`;
+                    showToast(`Device ready · TID: ${tid}`, 'success');
+                    updateStartButton();
+                } else {
+                    scenarioRegister.style.display = 'block';
+                    scenarioTrack.style.display = 'none';
+                    setTid(null);
+                    localStorage.removeItem(LS_REG);
+                    showToast('Please register your device', 'info');
+                }
+                updateHeaderStatus();
+            }
+
+            // --------------------------------------------------------------
+            //  REGISTER
+            // --------------------------------------------------------------
+            function handleRegister() {
+                const nationalId = nationalIdInput.value.trim();
+                const name = nameInput.value.trim();
+
+                if (!nationalId) {
+                    showToast('Please enter your National ID.', 'error');
+                    nationalIdInput.focus();
+                    return;
+                }
+                if (!name) {
+                    showToast('Please enter your full name.', 'error');
+                    nameInput.focus();
+                    return;
+                }
+                if (!/^\d{5,20}$/.test(nationalId)) {
+                    showToast('National ID should contain 5–20 digits.', 'error');
+                    return;
+                }
+
+                const nameMap = getNameMap();
+                if (nameMap[nationalId] && nameMap[nationalId] !== name) {
+                    if (!confirm(`National ID "${nationalId}" is already mapped to "${nameMap[nationalId]}". Replace with "${name}"?`)) {
+                        return;
+                    }
+                }
+                nameMap[nationalId] = name;
+                saveNameMap(nameMap);
+
+                const tid = generateTID();
+                const reg = { tid, nationalId, name };
+                localStorage.setItem(LS_REG, JSON.stringify(reg));
+                setTid(tid);
+
+                registerFeedback.innerHTML =
+                    `<span style="color:#2d9e5f;"><i class="fas fa-check-circle"></i> Registered! TID: <strong>${tid}</strong></span>`;
+
+                showToast(`Device registered · TID: ${tid}`, 'success');
+
+                setTimeout(() => {
+                    checkTID();
+                    renderLog();
+                    updateHeaderStatus();
+                    updateStartButton();
+                }, 400);
+            }
+
+            // --------------------------------------------------------------
+            //  START / STOP
+            // --------------------------------------------------------------
+            function handleStart() {
+                if (isRecording) return;
+                if (!getTid()) {
+                    showToast('No TID found. Please register.', 'error');
+                    return;
+                }
+                if (!gpsGranted) {
+                    showToast('GPS access is required. Please grant permission.', 'error');
+                    requestGpsPermission();
+                    return;
+                }
+                if (!navigator.geolocation) {
+                    showToast('Geolocation is not supported.', 'error');
+                    return;
+                }
+
+                isRecording = true;
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                recordingStatus.innerHTML =
+                    `<span class="status-dot recording" id="statusDot"></span> Recording…`;
+                headerStatus.textContent = '🟡 Recording';
+
+                // Start watching
+                watchId = navigator.geolocation.watchPosition(
+                    (pos) => {
+                        const { latitude, longitude, accuracy } = pos.coords;
+                        const timestamp = new Date().toISOString();
+                        const date = timestamp.split('T')[0];
+                        const tid = getTid();
+
+                        const data = getCollectedData();
+                        data.push({
+                            tid,
+                            timestamp,
+                            lat: latitude,
+                            lng: longitude,
+                            date,
+                            accuracy: Math.round(accuracy)
+                        });
+                        saveCollectedData(data);
+
+                        renderLog();
+                        showToast(`📍 Location recorded · ${formatTime(timestamp)}`, 'success');
+
+                        if (panels.viewer.classList.contains('active')) {
+                            renderViewer();
+                        }
+                    },
+                    (err) => {
+                        console.warn('Geolocation error:', err);
+                        showToast(`Location error: ${err.message}`, 'error');
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 3000
+                    }
+                );
+
+                showToast('📍 Tracking started', 'info');
+            }
+
+            function handleStop() {
+                if (!isRecording) return;
+                if (watchId !== null) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+                isRecording = false;
+                startBtn.disabled = !gpsGranted;
+                stopBtn.disabled = true;
+                recordingStatus.innerHTML =
+                    `<span class="status-dot idle" id="statusDot"></span> Idle`;
+                headerStatus.textContent = 'Ready';
+                showToast('⏹ Tracking stopped', 'info');
+                renderLog();
+                if (panels.viewer.classList.contains('active')) {
+                    renderViewer();
+                }
+                updateStartButton();
+            }
+
+            // --------------------------------------------------------------
+            //  LOG RENDER
+            // --------------------------------------------------------------
+            function renderLog() {
+                const data = getCollectedData();
+                const tid = getTid();
+
+                if (data.length === 0) {
+                    logContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-map-pin"></i>
+                            <p>No data collected yet.<br />Register and start tracking.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const entries = data.slice(-50).reverse();
+                let html = `<div class="log-area">`;
+                entries.forEach(entry => {
+                    const isOwn = entry.tid === tid;
+                    html += `
+                        <div class="entry">
+                            <span>
+                                ${isOwn ? '🟢' : '🔵'} 
+                                <strong>${entry.tid}</strong>
+                                <span class="time">${formatTime(entry.timestamp)}</span>
+                            </span>
+                            <span class="coord">${entry.lat.toFixed(5)}, ${entry.lng.toFixed(5)}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                logContainer.innerHTML = html;
+                const logArea = logContainer.querySelector('.log-area');
+                if (logArea) logArea.scrollTop = 0;
+            }
+
+            // --------------------------------------------------------------
+            //  CLEAR LOG / RESET
+            // --------------------------------------------------------------
+            function handleClearLog() {
+                if (!confirm('Delete ALL collected data?')) return;
+                saveCollectedData([]);
+                renderLog();
+                if (panels.viewer.classList.contains('active')) renderViewer();
+                showToast('All data cleared.', 'info');
+            }
+
+            function handleResetTid() {
+                if (!confirm('Reset device registration? This will clear TID and collected data.')) return;
+                if (isRecording) handleStop();
+                localStorage.removeItem(LS_TID);
+                localStorage.removeItem(LS_REG);
+                showToast('Device reset. Please register again.', 'info');
+                checkTID();
+                renderLog();
+                updateHeaderStatus();
+                updateStartButton();
+                if (panels.viewer.classList.contains('active')) renderViewer();
+            }
+
+            // --------------------------------------------------------------
+            //  HEADER STATUS
+            // --------------------------------------------------------------
+            function updateHeaderStatus() {
+                const tid = getTid();
+                if (tid) {
+                    headerStatus.textContent = `✅ TID: ${tid}`;
+                } else {
+                    headerStatus.textContent = '⚠️ Not registered';
+                }
+            }
+
+            // --------------------------------------------------------------
+            //  MAP INIT
+            // --------------------------------------------------------------
+            function initMap() {
+                if (mapInstance) return;
+                mapInstance = L.map('map', {
+                    center: [30.0444, 31.2357],
+                    zoom: 13,
+                    zoomControl: true,
+                });
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap',
+                    maxZoom: 19,
+                }).addTo(mapInstance);
+                setTimeout(() => mapInstance.invalidateSize(), 300);
+            }
+
+            // --------------------------------------------------------------
+            //  FILTER
+            // --------------------------------------------------------------
+            function handleFilterChange() {
+                currentFilter = filterNameInput.value.trim().toLowerCase();
+                renderViewer();
+            }
+
+            // --------------------------------------------------------------
+            //  VIEWER RENDER (first & last only, with filter)
+            // --------------------------------------------------------------
+            function renderViewer() {
+                const date = viewerDate.value;
+                if (!date) {
+                    showToast('Please select a date.', 'info');
+                    return;
+                }
+
+                const allData = getCollectedData();
+                let filtered = allData.filter(d => d.date === date);
+
+                // Apply name filter
+                const reg = getRegistration();
+                const nameMap = getNameMap();
+                let filterLower = currentFilter.toLowerCase();
+
+                if (filterLower) {
+                    // Build a map of TID -> display name
+                    const tidToName = {};
+                    // Current registration
+                    if (reg) tidToName[reg.tid] = reg.name.toLowerCase();
+                    // Also add from nameMap using nationalId? We don't have nationalId in data.
+                    // We'll just use the current registration for name mapping.
+                    // For other TIDs, we'll use the TID itself.
+                    // But we want to filter by name, so we need to know the name for each TID.
+                    // Since we only store the current registration, we'll only have the name for the current TID.
+                    // For other TIDs, we'll use the TID as the name for filtering.
+                    // Actually, we can store a global TID->name mapping by scanning all data and using the registration
+                    // if available. But we only have one registration.
+                    // Let's use a different approach: we'll store the name with each data point in the future.
+                    // For now, we'll filter by TID if the filter matches the TID, and by name if it matches the current user's name.
+                    // This is a limitation, but we'll work with it.
+                    // We'll filter by TID (exact match) or by name (if current user).
+                    filtered = filtered.filter(d => {
+                        const tid = d.tid;
+                        let displayName = tid;
+                        if (reg && reg.tid === tid) {
+                            displayName = reg.name;
+                        }
+                        const matchStr = (displayName + ' ' + tid).toLowerCase();
+                        return matchStr.includes(filterLower);
+                    });
+                }
+
+                const stats = `${filtered.length} points · ${new Set(filtered.map(d=>d.tid)).size} devices`;
+                viewerStats.textContent = stats;
+
+                if (filtered.length === 0) {
+                    viewerEmpty.style.display = 'block';
+                    viewerTable.style.display = 'none';
+                    mapPlaceholder.style.display = 'flex';
+                    clearMapLayers();
+                    return;
+                }
+
+                viewerEmpty.style.display = 'none';
+                viewerTable.style.display = 'table';
+                mapPlaceholder.style.display = 'none';
+
+                // Group by TID
+                const groups = {};
+                filtered.forEach(d => {
+                    if (!groups[d.tid]) groups[d.tid] = [];
+                    groups[d.tid].push(d);
+                });
+
+                Object.keys(groups).forEach(tid => {
+                    groups[tid].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                });
+
+                const tidList = Object.keys(groups);
+
+                // Build table: Name | First Location @ Time | Last Location @ Time | Points
+                let tbodyHtml = '';
+                tidList.forEach(tid => {
+                    const entries = groups[tid];
+                    const first = entries[0];
+                    const last = entries[entries.length - 1];
+
+                    // Determine display name
+                    let displayName = tid;
+                    if (reg && reg.tid === tid) {
+                        displayName = reg.name;
+                    } else {
+                        // Try to find name from nameMap using nationalId? We don't have it.
+                        // Use TID as fallback.
+                        displayName = tid;
+                    }
+
+                    const firstLoc = `${first.lat.toFixed(5)}, ${first.lng.toFixed(5)}`;
+                    const firstTime = formatTime(first.timestamp);
+                    const lastLoc = `${last.lat.toFixed(5)}, ${last.lng.toFixed(5)}`;
+                    const lastTime = formatTime(last.timestamp);
+
+                    tbodyHtml += `
+                        <tr>
+                            <td class="name-cell">${displayName}</td>
+                            <td class="loc-cell">
+                                <span class="coord-badge">${firstLoc}</span>
+                                <span class="time-tag">${firstTime}</span>
+                            </td>
+                            <td class="loc-cell">
+                                <span class="coord-badge">${lastLoc}</span>
+                                <span class="time-tag">${lastTime}</span>
+                            </td>
+                            <td style="text-align:center;">
+                                <span class="count-badge">${entries.length}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                viewerTableBody.innerHTML = tbodyHtml;
+
+                // ----- MAP: draw full paths -----
+                clearMapLayers();
+
+                const colors = ['#2a7de1', '#e44a4a', '#2d9e5f', '#e9a23b', '#9b59b6', '#1abc9c', '#e67e22', '#3498db'];
+                let colorIdx = 0;
+
+                tidList.forEach(tid => {
+                    const entries = groups[tid];
+                    if (entries.length < 1) return;
+                    const color = colors[colorIdx % colors.length];
+                    colorIdx++;
+
+                    const latlngs = entries.map(e => [e.lat, e.lng]);
+                    const polyline = L.polyline(latlngs, {
+                        color: color,
+                        weight: 3.5,
+                        opacity: 0.85,
+                        smoothFactor: 1.2,
+                    }).addTo(mapInstance);
+                    mapPolylines.push(polyline);
+
+                    // Markers: first, last, and intermediate with small dots
+                    entries.forEach((e, idx) => {
+                        let radius = 4;
+                        let fillColor = color;
+                        let borderColor = '#fff';
+                        let borderWeight = 1.5;
+                        if (idx === 0 || idx === entries.length - 1) {
+                            radius = 7;
+                            borderWeight = 2.5;
+                        }
+                        const marker = L.circleMarker([e.lat, e.lng], {
+                            radius: radius,
+                            fillColor: fillColor,
+                            color: borderColor,
+                            weight: borderWeight,
+                            opacity: 1,
+                            fillOpacity: 0.85,
+                        }).addTo(mapInstance);
+                        marker.bindTooltip(
+                            `${idx+1}/${entries.length} · ${formatTime(e.timestamp)}`,
+                            { permanent: false, direction: 'top', offset: [0, -6], className: 'custom-tooltip' }
+                        );
+                        mapMarkers.push(marker);
+                    });
+
+                    // Label for the TID/Name at the first point
+                    let displayName2 = tid;
+                    if (reg && reg.tid === tid) displayName2 = reg.name;
+                    const labelIcon = L.divIcon({
+                        html: `<span style="background:rgba(26,38,57,0.8);color:#fff;padding:2px 14px;border-radius:14px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.25);backdrop-filter:blur(4px);">${displayName2}</span>`,
+                        className: '',
+                        iconSize: [80, 26],
+                        iconAnchor: [40, 13]
+                    });
+                    const labelMarker = L.marker([entries[0].lat, entries[0].lng], { icon: labelIcon })
+                        .addTo(mapInstance);
+                    mapMarkers.push(labelMarker);
+
+                    // Add start/end icons
+                    const sIcon = L.divIcon({
+                        html: `<span style="background:${color};color:#fff;border-radius:50%;padding:2px 6px;font-size:10px;font-weight:700;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);">S</span>`,
+                        className: '',
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9]
+                    });
+                    const sMarker = L.marker([entries[0].lat, entries[0].lng], { icon: sIcon })
+                        .addTo(mapInstance);
+                    mapMarkers.push(sMarker);
+
+                    if (entries.length > 1) {
+                        const eIcon = L.divIcon({
+                            html: `<span style="background:${color};color:#fff;border-radius:50%;padding:2px 6px;font-size:10px;font-weight:700;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);">E</span>`,
+                            className: '',
+                            iconSize: [18, 18],
+                            iconAnchor: [9, 9]
+                        });
+                        const eMarker = L.marker([entries[entries.length - 1].lat, entries[entries.length - 1].lng], {
+                            icon: eIcon
+                        }).addTo(mapInstance);
+                        mapMarkers.push(eMarker);
+                    }
+                });
+
+                // Fit bounds
+                if (tidList.length > 0) {
+                    const allCoords = [];
+                    tidList.forEach(tid => {
+                        groups[tid].forEach(e => allCoords.push([e.lat, e.lng]));
+                    });
+                    if (allCoords.length > 0) {
+                        const bounds = L.latLngBounds(allCoords);
+                        mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+                    }
+                }
+
+                setTimeout(() => mapInstance.invalidateSize(), 300);
+            }
+
+            // --------------------------------------------------------------
+            //  CLEAR MAP LAYERS
+            // --------------------------------------------------------------
+            function clearMapLayers() {
+                mapMarkers.forEach(m => { if (m && mapInstance) mapInstance.removeLayer(m); });
+                mapPolylines.forEach(p => { if (p && mapInstance) mapInstance.removeLayer(p); });
+                mapMarkers = [];
+                mapPolylines = [];
+            }
+
+            // --------------------------------------------------------------
+            //  START
+            // --------------------------------------------------------------
+            document.addEventListener('DOMContentLoaded', init);
+
+        })();
     </script>
+
 </body>
 </html>
