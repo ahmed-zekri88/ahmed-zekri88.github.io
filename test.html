@@ -38,7 +38,6 @@
             border-radius: 32px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             padding: 28px 32px 36px;
-            transition: all 0.2s;
         }
 
         .app-header {
@@ -52,7 +51,6 @@
         .app-header h1 {
             font-size: 26px;
             font-weight: 700;
-            letter-spacing: -0.3px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -428,7 +426,7 @@
             font-size: 15px;
         }
 
-        /* VIEWER — All Devices Together */
+        /* VIEWER */
         .viewer-controls {
             display: flex;
             align-items: center;
@@ -655,7 +653,6 @@
             color: #2a7de1;
         }
 
-        /* GPS Permission Banner */
         .gps-permission-banner {
             background: #f0f7ff;
             border: 1.5px solid #b8d4f0;
@@ -958,9 +955,11 @@
                 <button class="btn-primary" id="refreshViewerBtn" style="padding:10px 22px;font-size:14px;">
                     <i class="fas fa-rotate"></i> Refresh
                 </button>
+                <button class="btn-outline" id="generateSampleBtn" style="font-size:12px;padding:6px 16px;">
+                    <i class="fas fa-dice"></i> Generate Sample Data
+                </button>
             </div>
 
-            <!-- Stats bar -->
             <div class="viewer-stats-bar" id="viewerStatsBar">
                 <span class="stat-item"><i class="fas fa-table"></i> <span id="statDeviceCount">0</span> devices</span>
                 <span class="stat-item"><i class="fas fa-map-pin"></i> <span id="statPointCount">0</span> points</span>
@@ -968,11 +967,10 @@
             </div>
 
             <div class="viewer-grid">
-                <!-- Table: all devices together -->
                 <div class="table-wrap" id="viewerTableWrap">
                     <div class="no-data-msg" id="viewerEmpty">
                         <i class="fas fa-table"></i>
-                        <p>No data for this date.<br />Collect some locations first.</p>
+                        <p>No data for this date.<br />Collect some locations or generate sample data.</p>
                     </div>
                     <table style="display:none;" id="viewerTable">
                         <thead>
@@ -987,14 +985,12 @@
                     </table>
                 </div>
 
-                <!-- Map: all paths together -->
                 <div class="map-container" id="mapContainer">
                     <div id="map"></div>
                     <div class="map-placeholder" id="mapPlaceholder">
                         <i class="fas fa-map"></i>
                         <p>Select a date with data to see all paths.</p>
                     </div>
-                    <!-- Legend will be injected here -->
                     <div id="legendContainer"></div>
                 </div>
             </div>
@@ -1019,7 +1015,7 @@
             const LS_REG = 'trackflow_registration';
             const LS_DATA = 'trackflow_data';
             const LS_NAME_MAP = 'trackflow_nameMap';
-            const LS_ALL_DEVICES = 'trackflow_allDevices'; // { tid, nationalId, name, registeredAt }
+            const LS_ALL_DEVICES = 'trackflow_allDevices';
 
             let watchId = null;
             let isRecording = false;
@@ -1071,6 +1067,7 @@
             const statPointCount = $('statPointCount');
             const statDateDisplay = $('statDateDisplay');
             const legendContainer = $('legendContainer');
+            const generateSampleBtn = $('generateSampleBtn');
 
             // --------------------------------------------------------------
             //  HELPERS
@@ -1089,6 +1086,11 @@
             function formatTime(iso) {
                 const d = new Date(iso);
                 return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+
+            function formatDate(iso) {
+                const d = new Date(iso);
+                return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             }
 
             function showToast(msg, type = 'info') {
@@ -1130,7 +1132,6 @@
                 else localStorage.removeItem(LS_TID);
             }
 
-            // All devices registry
             function getAllDevices() {
                 try { const raw = localStorage.getItem(LS_ALL_DEVICES); return raw ? JSON.parse(raw) : []; } catch { return []; }
             }
@@ -1149,6 +1150,71 @@
                     existing.name = name;
                     existing.nationalId = nationalId;
                     saveAllDevices(list);
+                }
+            }
+
+            // --------------------------------------------------------------
+            //  SAMPLE DATA GENERATION
+            // --------------------------------------------------------------
+            function generateSampleData() {
+                const devices = getAllDevices();
+                if (devices.length === 0) {
+                    showToast('No devices registered. Please register first.', 'error');
+                    return;
+                }
+
+                const today = getToday();
+                const baseLat = 30.0444;
+                const baseLng = 31.2357;
+                const pointsPerDevice = 8 + Math.floor(Math.random() * 6);
+
+                let allData = getCollectedData();
+                // Remove any existing data for today to avoid duplication
+                allData = allData.filter(d => d.date !== today);
+                const newData = [];
+
+                devices.forEach((device, idx) => {
+                    const offsetLat = (idx * 0.02) + (Math.random() - 0.5) * 0.02;
+                    const offsetLng = (idx * 0.02) + (Math.random() - 0.5) * 0.02;
+                    const points = [];
+                    for (let i = 0; i < pointsPerDevice; i++) {
+                        const t = i / (pointsPerDevice - 1);
+                        const lat = baseLat + offsetLat + Math.sin(t * 2 * Math.PI * 0.8) * 0.01 + (Math.random() - 0.5) *
+                            0.003;
+                        const lng = baseLng + offsetLng + Math.cos(t * 2 * Math.PI * 0.8) * 0.01 + (Math.random() - 0.5) *
+                            0.003;
+                        const timestamp = new Date();
+                        timestamp.setHours(8 + Math.floor(t * 12));
+                        timestamp.setMinutes(Math.floor(t * 60) % 60);
+                        timestamp.setSeconds(Math.floor(Math.random() * 60));
+                        const iso = timestamp.toISOString();
+                        points.push({
+                            tid: device.tid,
+                            timestamp: iso,
+                            lat: lat,
+                            lng: lng,
+                            date: today,
+                            accuracy: 10 + Math.floor(Math.random() * 20)
+                        });
+                    }
+                    newData.push(...points);
+                });
+
+                allData = allData.concat(newData);
+                saveCollectedData(allData);
+                showToast(`Generated ${newData.length} sample points for today.`, 'success');
+                renderLog();
+                if (panels.viewer.classList.contains('active')) renderViewer();
+            }
+
+            // Seed initial sample data on first load if empty
+            function seedInitialSample() {
+                const data = getCollectedData();
+                if (data.length === 0) {
+                    const devices = getAllDevices();
+                    if (devices.length > 0) {
+                        generateSampleData();
+                    }
                 }
             }
 
@@ -1259,7 +1325,7 @@
             function init() {
                 viewerDate.value = getToday();
 
-                // Seed name map
+                // Seed name map and devices
                 const nameMap = getNameMap();
                 if (Object.keys(nameMap).length === 0) {
                     const samples = {
@@ -1272,23 +1338,19 @@
                     saveNameMap(samples);
                 }
 
-                // Seed all devices from nameMap
+                // Seed all devices
                 const allDev = getAllDevices();
                 if (allDev.length === 0) {
-                    // Create sample devices from nameMap
-                    const reg = getRegistration();
-                    if (reg) {
-                        registerDeviceInList(reg.tid, reg.nationalId, reg.name);
-                    } else {
-                        // Create some sample devices
-                        const sampleTIDs = ['TID-ABC123', 'TID-DEF456', 'TID-GHI789', 'TID-JKL012'];
-                        const sampleNames = ['Ahmed Hassan', 'Sara Ali', 'Mohamed Ibrahim', 'Laila Nour'];
-                        const sampleNationalIds = ['1234567890', '0987654321', '1122334455', '5566778899'];
-                        sampleTIDs.forEach((tid, i) => {
-                            registerDeviceInList(tid, sampleNationalIds[i], sampleNames[i]);
-                        });
-                    }
+                    const sampleTIDs = ['TID-ABC123', 'TID-DEF456', 'TID-GHI789', 'TID-JKL012', 'TID-MNO345'];
+                    const sampleNames = ['Ahmed Hassan', 'Sara Ali', 'Mohamed Ibrahim', 'Laila Nour', 'Omar Khaled'];
+                    const sampleNationalIds = ['1234567890', '0987654321', '1122334455', '5566778899', '9988776655'];
+                    sampleTIDs.forEach((tid, i) => {
+                        registerDeviceInList(tid, sampleNationalIds[i], sampleNames[i]);
+                    });
                 }
+
+                // Seed sample data if empty
+                seedInitialSample();
 
                 checkTID();
                 checkGpsPermission();
@@ -1320,6 +1382,7 @@
                 filterNameInput.addEventListener('input', handleFilterChange);
                 clearFilterBtn.addEventListener('click', () => { filterNameInput.value = '';
                     handleFilterChange(); });
+                generateSampleBtn.addEventListener('click', generateSampleData);
 
                 [nationalIdInput, nameInput].forEach(inp => {
                     inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
@@ -1415,7 +1478,7 @@
                         const tid = getTid();
                         const data = getCollectedData();
                         data.push({ tid, timestamp, lat: latitude, lng: longitude, date,
-                        accuracy: Math.round(pos.coords.accuracy) });
+                            accuracy: Math.round(pos.coords.accuracy) });
                         saveCollectedData(data);
                         renderLog();
                         showToast(`📍 ${formatTime(timestamp)}`, 'success');
@@ -1521,18 +1584,15 @@
                 const allData = getCollectedData();
                 let filteredData = allData.filter(d => d.date === date);
 
-                // Filter by name/TID
                 const reg = getRegistration();
                 const nameMap = getNameMap();
                 const allDevices = getAllDevices();
                 let filterLower = currentFilter.toLowerCase();
 
-                // Build TID -> display name mapping
                 const tidToName = {};
                 allDevices.forEach(d => { tidToName[d.tid] = d.name; });
                 if (reg) tidToName[reg.tid] = reg.name;
 
-                // Apply filter
                 if (filterLower) {
                     filteredData = filteredData.filter(d => {
                         const displayName = tidToName[d.tid] || d.tid;
@@ -1540,12 +1600,9 @@
                     });
                 }
 
-                // Also include devices that have no data on this date? We want to show ALL devices together.
-                // We'll show all devices from the registry, and mark those with data.
                 const devicesWithData = new Set(filteredData.map(d => d.tid));
                 const allDeviceTIDs = allDevices.map(d => d.tid);
 
-                // If no data at all, show empty state
                 if (allDeviceTIDs.length === 0 && filteredData.length === 0) {
                     viewerEmpty.style.display = 'block';
                     viewerTable.style.display = 'none';
@@ -1562,7 +1619,6 @@
                 viewerTable.style.display = 'table';
                 mapPlaceholder.style.display = 'none';
 
-                // Group data by TID
                 const groups = {};
                 filteredData.forEach(d => {
                     if (!groups[d.tid]) groups[d.tid] = [];
@@ -1572,18 +1628,14 @@
                     groups[tid].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                 });
 
-                // Determine which TIDs to show: all devices from registry + any extra TIDs from data
                 const dataTIDs = Object.keys(groups);
                 const allTIDs = new Set([...allDeviceTIDs, ...dataTIDs]);
                 const tidList = Array.from(allTIDs);
 
-                // Stats
                 statDeviceCount.textContent = tidList.length;
-                const totalPoints = filteredData.length;
-                statPointCount.textContent = totalPoints;
+                statPointCount.textContent = filteredData.length;
                 statDateDisplay.textContent = formatDate(date);
 
-                // Build table: show all devices, with data or "No data"
                 const colors = ['#2a7de1', '#e44a4a', '#2d9e5f', '#e9a23b', '#9b59b6', '#1abc9c', '#e67e22', '#3498db',
                     '#e84393', '#00b894'
                 ];
@@ -1639,16 +1691,15 @@
 
                 viewerTableBody.innerHTML = tbodyHtml;
 
-                // ----- MAP: show all devices with data (only those with points) -----
+                // ----- MAP: show all devices with data -----
                 clearMapLayers();
 
-                const mapTIDs = dataTIDs; // only show paths for devices with data
+                const mapTIDs = dataTIDs;
                 if (mapTIDs.length === 0) {
                     legendContainer.innerHTML = '';
                     return;
                 }
 
-                // Build legend
                 let legendHtml = `<div class="device-legend">`;
                 mapTIDs.forEach(tid => {
                     const displayName = tidToName[tid] || tid;
@@ -1659,9 +1710,7 @@
                 legendHtml += `</div>`;
                 legendContainer.innerHTML = legendHtml;
 
-                // Draw paths
-                let usedColors = {};
-                mapTIDs.forEach((tid, idx) => {
+                mapTIDs.forEach((tid) => {
                     const entries = groups[tid];
                     if (!entries || entries.length < 1) return;
                     const color = tidColor[tid];
@@ -1675,7 +1724,6 @@
                     }).addTo(mapInstance);
                     mapPolylines.push(polyline);
 
-                    // Markers
                     entries.forEach((e, i) => {
                         const radius = (i === 0 || i === entries.length - 1) ? 7 : 4;
                         const marker = L.circleMarker([e.lat, e.lng], {
@@ -1697,7 +1745,6 @@
                         mapMarkers.push(marker);
                     });
 
-                    // Label at first point
                     const labelIcon = L.divIcon({
                         html: `<span style="background:rgba(26,38,57,0.85);color:#fff;padding:2px 14px;border-radius:14px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(4px);">${tidToName[tid]||tid}</span>`,
                         className: '',
@@ -1708,7 +1755,6 @@
                         .addTo(mapInstance);
                     mapMarkers.push(labelMarker);
 
-                    // Start/End icons
                     const sIcon = L.divIcon({
                         html: `<span style="background:${color};color:#fff;border-radius:50%;padding:2px 6px;font-size:10px;font-weight:700;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);">S</span>`,
                         className: '',
@@ -1733,7 +1779,6 @@
                     }
                 });
 
-                // Fit bounds
                 const allCoords = [];
                 mapTIDs.forEach(tid => {
                     (groups[tid] || []).forEach(e => allCoords.push([e.lat, e.lng]));
