@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <style>
+        /* ---------- RESET & LAYOUT ---------- */
         * {
             margin: 0;
             padding: 0;
@@ -76,9 +77,6 @@
             align-items: center;
             gap: 8px;
         }
-        .app-header .badge i {
-            color: #2a7de1;
-        }
         .app-header .badge .sync-status {
             width: 10px;
             height: 10px;
@@ -90,6 +88,9 @@
         }
         .sync-status.offline {
             background: #f87171;
+        }
+        .sync-status.error {
+            background: #fbbf24;
         }
 
         .tabs {
@@ -152,7 +153,7 @@
             }
         }
 
-        /* COLLECTOR */
+        /* ---------- COLLECTOR ---------- */
         .collector-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -444,7 +445,7 @@
             font-size: 15px;
         }
 
-        /* VIEWER */
+        /* ---------- VIEWER ---------- */
         .viewer-controls {
             display: flex;
             align-items: center;
@@ -848,6 +849,31 @@
             color: #1a2639;
             font-size: 12px;
         }
+
+        /* Firebase config warning */
+        .config-warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .config-warning i {
+            font-size: 20px;
+            color: #f59e0b;
+        }
+        .config-warning code {
+            background: #fff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1a2639;
+        }
     </style>
 </head>
 <body>
@@ -860,7 +886,7 @@
                 <i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i>
                 <span id="headerStatus">Ready</span>
                 <span class="sync-status offline" id="syncStatusDot"></span>
-                <span id="syncStatusLabel" style="font-weight:400;font-size:12px;">Offline</span>
+                <span id="syncStatusLabel" style="font-weight:400;font-size:12px;">Local Only</span>
             </div>
         </div>
 
@@ -873,8 +899,18 @@
             </button>
         </div>
 
-        <!-- ===== COLLECTOR ===== -->
+        <!-- ==================== COLLECTOR ==================== -->
         <div class="panel active" id="panel-collector">
+
+            <!-- Firebase config warning (will be shown if config is missing) -->
+            <div class="config-warning" id="configWarning" style="display:none;">
+                <i class="fas fa-triangle-exclamation"></i>
+                <span>
+                    <strong>Local Only Mode:</strong> To sync across devices, paste your Firebase config in the
+                    <code>firebaseConfig</code> object inside the JavaScript (line ~420).
+                    <a href="#" onclick="alert('Edit the HTML file and replace the placeholder firebaseConfig with your Firebase project settings.')" style="color:#2a7de1;text-decoration:underline;">Learn more</a>
+                </span>
+            </div>
 
             <div class="gps-permission-banner" id="gpsBanner">
                 <div class="gps-status">
@@ -957,7 +993,7 @@
             </div>
         </div>
 
-        <!-- ===== VIEWER ===== -->
+        <!-- ==================== VIEWER ==================== -->
         <div class="panel" id="panel-viewer">
 
             <div class="viewer-controls">
@@ -1028,12 +1064,12 @@
         (function() {
             'use strict';
 
-            // --------------------------------------------------------------
-            //  🔥 FIREBASE CONFIGURATION (Cross-Device Sync)
-            //  To enable real-time sync across all devices, create a Firebase
-            //  Realtime Database project and paste your config below.
-            //  If left empty, the app will work in local-only mode.
-            // --------------------------------------------------------------
+            // ==============================================================
+            //  🔥 FIREBASE CONFIGURATION
+            //  To enable cross-device sync, replace the placeholder values
+            //  below with your Firebase project's config object.
+            //  Get it from: Firebase Console > Project Settings > Your apps
+            // ==============================================================
             // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDUpJ11BXmAHKpnd0DxK_K-qaFhrNR0tUc",
@@ -1044,10 +1080,9 @@ const firebaseConfig = {
   appId: "1:216073252098:web:ff75d4d3e6b0175f64661b",
   measurementId: "G-GWP1PTC105"
 };
-
-            // --------------------------------------------------------------
+            // ==============================================================
             //  STATE
-            // --------------------------------------------------------------
+            // ==============================================================
             const LS_TID = 'trackflow_tid';
             const LS_REG = 'trackflow_registration';
             const LS_DATA = 'trackflow_data';
@@ -1109,23 +1144,29 @@ const firebaseConfig = {
             const generateSampleBtn = $('generateSampleBtn');
             const syncStatusDot = $('syncStatusDot');
             const syncStatusLabel = $('syncStatusLabel');
+            const configWarning = $('configWarning');
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  FIREBASE INIT
-            // --------------------------------------------------------------
+            // ==============================================================
             function initFirebase() {
-                const hasConfig = firebaseConfig.apiKey && firebaseConfig.apiKey !== "AIzaSyDUpJ11BXmAHKpnd0DxK_K-qaFhrNR0tUc";
+                const hasConfig = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
+
                 if (!hasConfig) {
                     syncStatusDot.className = 'sync-status offline';
                     syncStatusLabel.textContent = 'Local Only';
+                    configWarning.style.display = 'flex';
+                    console.warn('Firebase config missing. Running in local-only mode.');
                     return;
                 }
+                configWarning.style.display = 'none';
 
                 try {
                     firebase.initializeApp(firebaseConfig);
                     firebaseInitialized = true;
                     syncStatusDot.className = 'sync-status online';
                     syncStatusLabel.textContent = 'Cloud Sync';
+                    console.log('🔥 Firebase initialized successfully.');
 
                     // Listen for real-time updates
                     const db = firebase.database();
@@ -1135,27 +1176,33 @@ const firebaseConfig = {
                         const val = snapshot.val();
                         if (val) {
                             const fbData = Object.values(val);
-                            // Merge with local data (local takes precedence for writes, but we want to display union)
                             const localData = getLocalData();
                             const merged = mergeData(localData, fbData);
                             allDataCache = merged;
-                            // Save merged data locally to keep consistency
                             saveLocalData(merged);
                             renderLog();
                             if (panels.viewer.classList.contains('active')) {
                                 renderViewer();
                             }
+                            console.log(`☁️ Synced ${fbData.length} points from cloud.`);
                         }
                     }, (error) => {
                         console.warn('Firebase read error:', error);
-                        syncStatusDot.className = 'sync-status offline';
+                        syncStatusDot.className = 'sync-status error';
                         syncStatusLabel.textContent = 'Sync Error';
+                        showToast('Firebase sync error. Check console.', 'error');
                     });
 
                 } catch (e) {
                     console.warn('Firebase init error:', e);
                     syncStatusDot.className = 'sync-status offline';
                     syncStatusLabel.textContent = 'Init Error';
+                    configWarning.style.display = 'flex';
+                    configWarning.innerHTML =
+                        `
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span><strong>Firebase Error:</strong> ${e.message}. Please check your config and database rules.</span>
+                    `;
                 }
             }
 
@@ -1173,9 +1220,9 @@ const firebaseConfig = {
                 return Array.from(map.values());
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  LOCAL STORAGE HELPERS
-            // --------------------------------------------------------------
+            // ==============================================================
             function getLocalData() {
                 try { const raw = localStorage.getItem(LS_DATA); return raw ? JSON.parse(raw) : []; } catch { return []; }
             }
@@ -1185,21 +1232,18 @@ const firebaseConfig = {
             }
 
             function getCollectedData() {
-                // Return cached merged data if available, else local
                 if (allDataCache.length > 0) return allDataCache;
                 return getLocalData();
             }
 
             function saveCollectedData(data) {
-                // Save locally
                 saveLocalData(data);
                 allDataCache = data;
-                // Push to Firebase if enabled
+
                 if (firebaseInitialized) {
                     try {
                         const db = firebase.database();
                         const ref = db.ref('trackflow_data');
-                        // We store each point with a unique key based on timestamp + tid
                         const updates = {};
                         data.forEach(d => {
                             const key = d.timestamp.replace(/[:.]/g, '_') + '_' + d.tid;
@@ -1254,9 +1298,9 @@ const firebaseConfig = {
                 }
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  HELPERS
-            // --------------------------------------------------------------
+            // ==============================================================
             function generateTID() {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 let code = 'TID-';
@@ -1288,9 +1332,9 @@ const firebaseConfig = {
                 toast._timer = setTimeout(() => toast.classList.remove('show'), 3200);
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  GPS
-            // --------------------------------------------------------------
+            // ==============================================================
             function checkGpsPermission() {
                 if (!navigator.geolocation) {
                     gpsGranted = false;
@@ -1389,9 +1433,9 @@ const firebaseConfig = {
                 startBtn.disabled = !valid || isRecording;
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  SAMPLE DATA
-            // --------------------------------------------------------------
+            // ==============================================================
             function generateSampleData() {
                 const devices = getAllDevices();
                 if (devices.length === 0) {
@@ -1452,9 +1496,9 @@ const firebaseConfig = {
                 }
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  INIT
-            // --------------------------------------------------------------
+            // ==============================================================
             function init() {
                 viewerDate.value = getToday();
 
@@ -1481,7 +1525,7 @@ const firebaseConfig = {
                     });
                 }
 
-                // Init Firebase
+                // Init Firebase (will show Local Only if config is missing)
                 initFirebase();
 
                 // Load initial data
@@ -1530,9 +1574,9 @@ const firebaseConfig = {
                 updateHeaderStatus();
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  TID CHECK
-            // --------------------------------------------------------------
+            // ==============================================================
             function checkTID() {
                 const tid = getTid(),
                     reg = getRegistration();
@@ -1555,9 +1599,9 @@ const firebaseConfig = {
                 updateHeaderStatus();
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  REGISTER
-            // --------------------------------------------------------------
+            // ==============================================================
             function handleRegister() {
                 const nationalId = nationalIdInput.value.trim();
                 const name = nameInput.value.trim();
@@ -1592,9 +1636,9 @@ const firebaseConfig = {
                 }, 400);
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  START / STOP
-            // --------------------------------------------------------------
+            // ==============================================================
             function handleStart() {
                 if (isRecording) return;
                 if (!getTid()) { showToast('No TID. Please register.', 'error'); return; }
@@ -1643,9 +1687,9 @@ const firebaseConfig = {
                 updateStartButton();
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  LOG
-            // --------------------------------------------------------------
+            // ==============================================================
             function renderLog() {
                 const data = getCollectedData();
                 const tid = getTid();
@@ -1691,9 +1735,9 @@ const firebaseConfig = {
                 headerStatus.textContent = tid ? `✅ TID: ${tid}` : '⚠️ Not registered';
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  MAP
-            // --------------------------------------------------------------
+            // ==============================================================
             function initMap() {
                 if (mapInstance) return;
                 mapInstance = L.map('map', { center: [30.0444, 31.2357], zoom: 13, zoomControl: true });
@@ -1704,17 +1748,17 @@ const firebaseConfig = {
                 setTimeout(() => mapInstance.invalidateSize(), 300);
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  FILTER
-            // --------------------------------------------------------------
+            // ==============================================================
             function handleFilterChange() {
                 currentFilter = filterNameInput.value.trim().toLowerCase();
                 renderViewer();
             }
 
-            // --------------------------------------------------------------
-            //  VIEWER — ALL DEVICES TOGETHER
-            // --------------------------------------------------------------
+            // ==============================================================
+            //  VIEWER
+            // ==============================================================
             function renderViewer() {
                 const date = viewerDate.value;
                 if (!date) { showToast('Select a date.', 'info'); return; }
@@ -1829,7 +1873,7 @@ const firebaseConfig = {
 
                 viewerTableBody.innerHTML = tbodyHtml;
 
-                // ----- MAP: show all devices with data -----
+                // ----- MAP -----
                 clearMapLayers();
 
                 const mapTIDs = dataTIDs;
@@ -1929,9 +1973,9 @@ const firebaseConfig = {
                 setTimeout(() => mapInstance.invalidateSize(), 300);
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  CLEAR MAP
-            // --------------------------------------------------------------
+            // ==============================================================
             function clearMapLayers() {
                 mapMarkers.forEach(m => { if (m && mapInstance) mapInstance.removeLayer(m); });
                 mapPolylines.forEach(p => { if (p && mapInstance) mapInstance.removeLayer(p); });
@@ -1939,9 +1983,9 @@ const firebaseConfig = {
                 mapPolylines = [];
             }
 
-            // --------------------------------------------------------------
+            // ==============================================================
             //  START
-            // --------------------------------------------------------------
+            // ==============================================================
             document.addEventListener('DOMContentLoaded', init);
 
         })();
