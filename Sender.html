@@ -212,20 +212,20 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
-            // 2. Date and Time
-            const now = new Date();
-            const dateStr = now.toLocaleDateString();
-            const timeStr = now.toLocaleTimeString();
+            // 2. Date and Time — send in unambiguous formats
+		const now = new Date();
+		const pad = n => String(n).padStart(2, '0');
+		const dateStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`; // DD/MM/YYYY
+		const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`; // HH:MM:SS (24h)
 
-            // 3. Prepare Data
-            const formData = new URLSearchParams();
-            formData.append('nid', nid);
-            formData.append('deviceId', deviceId);
-            formData.append('latitude', latitude);
-            formData.append('longitude', longitude);
-            // Prefix with ' so Google Sheets stores as plain text, not auto-converted dates/times
-            formData.append('date', "'" + dateStr);
-            formData.append('time', "'" + timeStr);
+	     // 3. Prepare Data
+		const formData = new URLSearchParams();
+		formData.append('nid', nid);
+		formData.append('deviceId', deviceId);
+		formData.append('latitude', latitude);
+		formData.append('longitude', longitude);
+		formData.append('date', dateStr);  // no apostrophe needed anymore
+		formData.append('time', timeStr);  // no apostrophe needed anymore
 
             setStatus("📤 Sending...", "working");
 
