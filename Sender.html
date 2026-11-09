@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TeleTech Attendance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: sans-serif; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; background: #f0f2f5; margin: 0; padding: 20px;
+        }
+        .card {
+            background: white; padding: 40px; border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12); text-align: center;
+            max-width: 420px; width: 100%;
+        }
+        h2 { margin-top: 0; color: #007bff; font-size: 1.9em; }
+        .subtitle { color: #666; font-size: 1.05em; margin-bottom: 25px; }
+
+        button {
+            padding: 18px 50px; font-size: 20px; font-weight: 700;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; border: none; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.35);
+            transition: transform 0.15s, box-shadow 0.15s;
+            letter-spacing: 1px;
+        }
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,123,255,0.5); }
+        button:active:not(:disabled) { transform: translateY(0); }
+        button:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+
+        /* Big flashing status messages */
+        #status {
+            margin-top: 25px; min-height: 34px;
+            font-size: 1.15em; font-weight: 600;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #status:empty { display: none; }
+
+        /* Success — green, pulsing glow */
+        #status.success {
+            color: #fff;
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            padding: 16px 22px; border-radius: 12px;
+            font-size: 1.35em;
+            box-shadow: 0 0 0 0 rgba(40,167,69,0.7);
+            animation: pulseSuccess 1.2s infinite, flash 0.8s infinite alternate;
+        }
+        @keyframes pulseSuccess {
+            0%   { box-shadow: 0 0 0 0 rgba(40,167,69,0.7); }
+            70%  { box-shadow: 0 0 0 18px rgba(40,167,69,0); }
+            100% { box-shadow: 0 0 0 0 rgba(40,167,69,0); }
+        }
+        @keyframes flash {
+            from { filter: brightness(1); }
+            to   { filter: brightness(1.25); }
+        }
+
+        /* Error — red, shake + flash */
+        #status.error {
+            color: #fff;
+            background: linear-gradient(135deg, #dc3545, #a71d2a);
+            padding: 16px 22px; border-radius: 12px;
+            font-size: 1.35em;
+            box-shadow: 0 0 0 0 rgba(220,53,69,0.7);
+            animation: shake 0.5s infinite, flashError 0.6s infinite alternate;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-4px); }
+            40%      { transform: translateX(4px); }
+            60%      { transform: translateX(-3px); }
+            80%      { transform: translateX(3px); }
+        }
+        @keyframes flashError {
+            from { background: linear-gradient(135deg, #dc3545, #a71d2a); }
+            to   { background: linear-gradient(135deg, #ff4d5e, #dc3545); }
+        }
+
+        /* Neutral "working..." state */
+        #status.working {
+            color: #007bff; font-size: 1.1em;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; padding: 30px; border-radius: 12px; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25); max-width: 360px; width: 90%;
+        }
+        .modal h3 { margin-top: 0; color: #333; }
+        .modal p { color: #666; font-size: 0.9em; }
+        .modal input {
+            width: 100%; padding: 12px; font-size: 16px; margin: 15px 0;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;
+        }
+        .modal button {
+            width: 100%; padding: 12px; font-size: 16px; border-radius: 8px;
+        }
+        .modal-error { color: #dc3545; font-size: 0.85em; min-height: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>TeleTech Attendance</h2>
+    <p class="subtitle">Click to start/stop work</p>
+    <button id="pushBtn" onclick="sendData()" disabled>PUSH</button>
+    <div id="status"></div>
+    <!-- Device ID / NID info line removed (hidden from UI) -->
+</div>
+
+<!-- NID Modal -->
+<div class="modal-overlay" id="nidModal">
+    <div class="modal">
+        <h3>Register Your Device</h3>
+        <p>No device ID found. Please enter your NID to create one.</p>
+        <input type="text" id="nidInput" placeholder="Enter your NID" inputmode="numeric" autocomplete="off">
+        <div class="modal-error" id="nidError"></div>
+        <button onclick="registerNID()">Create Device ID</button>
+    </div>
+</div>
+
+<script>
+    // REPLACE THIS WITH YOUR DEPLOYED WEB APP URL
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwzDPWNcCDu_G6_-goG8TsHNu9Ju0d5UUINPagpB5LxTye5SB7_HVAI7JLgxI0oDBrF/exec";
+
+    const LS_DEVICE_ID = "sender_device_id";
+    const LS_NID       = "sender_nid";
+
+    // ---------- Status helpers ----------
+    function setStatus(text, kind) {
+        const el = document.getElementById('status');
+        el.className = kind ? kind : '';
+        el.innerText = text || '';
+    }
+
+    // ---------- Helpers ----------
+    function generateUUID() {
+        if (crypto && crypto.randomUUID) return crypto.randomUUID();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    function showModal() {
+        document.getElementById('nidModal').classList.add('active');
+        document.getElementById('nidInput').focus();
+    }
+    function hideModal() {
+        document.getElementById('nidModal').classList.remove('active');
+    }
+
+    // ---------- Device Registration ----------
+    function initDevice() {
+        const deviceId = localStorage.getItem(LS_DEVICE_ID);
+        const nid = localStorage.getItem(LS_NID);
+
+        if (deviceId && nid) {
+            onDeviceReady();
+        } else {
+            showModal();
+        }
+    }
+
+    function registerNID() {
+        const nidInput = document.getElementById('nidInput');
+        const errorEl = document.getElementById('nidError');
+        const nid = nidInput.value.trim();
+
+        if (!nid) { errorEl.innerText = "Please enter your NID."; return; }
+        if (!/^\d{6,20}$/.test(nid)) { errorEl.innerText = "NID must be numeric (6-20 digits)."; return; }
+
+        const deviceId = generateUUID();
+        localStorage.setItem(LS_DEVICE_ID, deviceId);
+        localStorage.setItem(LS_NID, nid);
+
+        errorEl.innerText = "";
+        hideModal();
+        onDeviceReady();
+    }
+
+    function onDeviceReady() {
+        document.getElementById('pushBtn').disabled = false;
+        setStatus("", "");
+    }
+
+    // ---------- Send Data ----------
+    async function sendData() {
+        const deviceId = localStorage.getItem(LS_DEVICE_ID);
+        const nid = localStorage.getItem(LS_NID);
+
+        if (!deviceId || !nid) { showModal(); return; }
+
+        const btn = document.getElementById('pushBtn');
+        btn.disabled = true;
+        setStatus("⏳ Collecting data...", "working");
+
+        try {
+            // 1. GPS Location
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+            });
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            // 2. Date and Time
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+
+            // 3. Prepare Data
+            const formData = new URLSearchParams();
+            formData.append('nid', nid);
+            formData.append('deviceId', deviceId);
+            formData.append('latitude', latitude);
+            formData.append('longitude', longitude);
+            // Prefix with ' so Google Sheets stores as plain text, not auto-converted dates/times
+            formData.append('date', "'" + dateStr);
+            formData.append('time', "'" + timeStr);
+
+            setStatus("📤 Sending...", "working");
+
+            // 4. Send to Google Script
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+
+            const result = await response.json();
+            if (result.result === "success") {
+                setStatus("✅ Data sent successfully!", "success");
+            } else {
+                setStatus("❌ Error: " + (result.message || "unknown"), "error");
+            }
+        } catch (error) {
+            console.error(error);
+            // Special-case the geolocation denial for a clearer message
+            if (error && error.code === 1) {
+                setStatus("❌ Error: User denied Geolocation", "error");
+            } else {
+                setStatus("❌ Error: " + error.message, "error");
+            }
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    // Allow Enter key in NID input
+    document.getElementById('nidInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') registerNID();
+    });
+
+    // ---------- On Load ----------
+    initDevice();
+</script>
+
+</body>
+</html>
